@@ -1,20 +1,16 @@
-
-
 export interface PetriNet {
-  id: number
+    id: number
 }
 
 export enum ArcType {
-  INHIBITOR = 'INHIBITOR',
-  REGULAR = 'REGULAR',
-  RESET = 'RESET'
+    INHIBITOR = 'INHIBITOR',
+    REGULAR = 'REGULAR',
+    RESET = 'RESET',
 }
 
 export interface Arc {
-  type: ArcType
-  weight: number
+    type: ArcType
+    weight: number
 }
 
-export interface Transition {
-
-}
+export interface Transition {}
