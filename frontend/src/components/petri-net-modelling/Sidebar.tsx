@@ -1,5 +1,4 @@
-import Box from '@mui/material/Box'
-import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles'
+import { styled, Theme, CSSObject } from '@mui/material/styles'
 import MuiDrawer from '@mui/material/Drawer'
 import List from '@mui/material/List'
 import Divider from '@mui/material/Divider'
@@ -7,15 +6,11 @@ import IconButton from '@mui/material/IconButton'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
-import InboxIcon from '@mui/icons-material/MoveToInbox'
-import MailIcon from '@mui/icons-material/Mail'
-import MenuIcon from '@mui/icons-material/Menu'
-import { useState } from 'react'
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined'
+import CropPortraitSharpIcon from '@mui/icons-material/CropPortraitSharp'
 
-const drawerWidth = 240
+const drawerWidth = 180
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -57,18 +52,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     })
 )
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-}))
+interface SideBarProps {
+    openDrawer: boolean
+    setOpenDrawer: (value: boolean) => void
+}
 
-export default function PetriNetModelling() {
-    const [open, setOpen] = useState(false)
-
+export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBarProps) {
     const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
         event.dataTransfer.setData('application/reactflow', nodeType)
         event.dataTransfer.effectAllowed = 'move'
@@ -76,74 +65,67 @@ export default function PetriNetModelling() {
 
     return (
         <>
-            <Drawer variant="permanent" open={open}>
+            <Drawer variant="permanent" open={openDrawer} style={{ zIndex: 5 }}>
                 <div style={{ height: '60px' }}> </div>
-                <DrawerHeader>
-                    {open ? (
-                        <IconButton onClick={() => setOpen(false)}>
+                <div style={{ height: '60px' }}>
+                    {openDrawer ? (
+                        <IconButton
+                            onClick={() => setOpenDrawer(false)}
+                            style={{ marginTop: 10, marginLeft: drawerWidth - 50 }}
+                        >
                             <ChevronLeftIcon />
                         </IconButton>
                     ) : (
                         <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={() => setOpen(true)}
-                            edge="start"
+                            onClick={() => setOpenDrawer(true)}
+                            style={{ marginTop: 10, marginLeft: 10 }}
                         >
                             <ChevronRightIcon />
                         </IconButton>
                     )}
-                </DrawerHeader>
+                </div>
                 <Divider />
                 <List>
-                    <ListItem disablePadding sx={{ display: 'block' }}>
+                    <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
                         <div
                             className="dndnode input"
                             onDragStart={(event) => onDragStart(event, 'input')}
                             draggable
+                            style={{ display: 'flex', flexDirection: 'row' }}
                         >
-                            Place
-                        </div>
-                    </ListItem>
-                    <ListItem disablePadding sx={{ display: 'block' }}>
-                        <div
-                            className="dndnode input"
-                            onDragStart={(event) => onDragStart(event, 'input')}
-                            draggable
-                        >
-                            Transition
-                        </div>
-                    </ListItem>
-                </List>
-                <Divider />
-                <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-                            <ListItemButton
+                            <ListItemIcon
                                 sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
+                                    justifyContent: 'center',
+                                    width: '64px',
+                                    height: '40px',
                                 }}
                             >
-                                <ListItemIcon
-                                    sx={{
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                                </ListItemIcon>
-                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
+                                <CircleOutlinedIcon />
+                            </ListItemIcon>
+                            {openDrawer && 'Place'}
+                        </div>
+                    </ListItem>
+                    <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
+                        <div
+                            className="dndnode input"
+                            onDragStart={(event) => onDragStart(event, 'input')}
+                            draggable
+                            style={{ display: 'flex', flexDirection: 'row' }}
+                        >
+                            <ListItemIcon
+                                sx={{
+                                    justifyContent: 'center',
+                                    width: '64px',
+                                    height: '40px',
+                                }}
+                            >
+                                <CropPortraitSharpIcon />
+                            </ListItemIcon>
+                            {openDrawer && 'Transition'}
+                        </div>
+                    </ListItem>
                 </List>
             </Drawer>
-            <Box sx={{ display: 'flex' }}>
-                <h1> Modelling </h1>
-            </Box>
         </>
     )
 }

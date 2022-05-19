@@ -36,7 +36,7 @@ export default function Transforming() {
     }
 
     return (
-        <>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
             <Grid container spacing={2} sx={{ padding: 10, maxWidth: 1000 }}>
                 <Grid item xs={5}>
                     <FormControl fullWidth>
@@ -87,6 +87,6 @@ export default function Transforming() {
                     <Button variant="outlined">Convert</Button>
                 </Grid>
             </Grid>
-        </>
+        </div>
     )
 }
