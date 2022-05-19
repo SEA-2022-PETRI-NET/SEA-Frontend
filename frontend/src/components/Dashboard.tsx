@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography'
 import { Routes, Route, NavLink } from 'react-router-dom'
 import { Button } from '@mui/material'
 import PetriNetModelling from './PetriNetModelling'
+import Transforming from './Transforming'
 
 export default function Dashboard() {
     return (
@@ -35,7 +36,7 @@ export default function Dashboard() {
             <Box>
                 <Routes>
                     <Route path="/" element={<PetriNetModelling />} />
-                    <Route path="/transformer" element={<h1>transformer</h1>} />
+                    <Route path="/transformer" element={<Transforming />} />
                     <Route path="about" element={<h1>about</h1>} />
                 </Routes>
             </Box>
