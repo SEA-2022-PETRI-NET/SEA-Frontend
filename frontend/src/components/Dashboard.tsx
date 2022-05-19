@@ -12,7 +12,14 @@ export default function Dashboard() {
         <>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <Toolbar sx={{ backgroundColor: '#0da2ff', width: '100%' }}>
+                <Toolbar
+                    sx={{
+                        backgroundColor: '#0da2ff',
+                        width: '100%',
+                        position: 'absolute',
+                        zIndex: 2,
+                    }}
+                >
                     <Typography
                         component="h1"
                         variant="h6"

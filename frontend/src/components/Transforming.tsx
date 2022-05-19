@@ -6,6 +6,8 @@ import Select from '@mui/material/Select'
 import { useState } from 'react'
 import { Upload, message } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
+import 'antd/dist/antd.css'
+import Button from '@mui/material/Button'
 
 const { Dragger } = Upload
 
@@ -35,13 +37,10 @@ export default function Transforming() {
 
     return (
         <>
-            <Grid container spacing={2} sx={{ padding: 10 }}>
-                <Grid item xs={2}>
-                    From:
-                </Grid>
-                <Grid item xs={4}>
+            <Grid container spacing={2} sx={{ padding: 10, maxWidth: 1000 }}>
+                <Grid item xs={5}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                        <InputLabel id="demo-simple-select-label">From Type</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
@@ -55,12 +54,10 @@ export default function Transforming() {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={2}>
-                    To:
-                </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={2}></Grid>
+                <Grid item xs={5}>
                     <FormControl fullWidth>
-                        <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                        <InputLabel id="demo-simple-select-label">To Type</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
@@ -74,8 +71,7 @@ export default function Transforming() {
                         </Select>
                     </FormControl>
                 </Grid>
-                <Grid item xs={2}></Grid>
-                <Grid item xs={10}>
+                <Grid item xs={12}>
                     <Dragger {...props}>
                         <p className="ant-upload-drag-icon">
                             <InboxOutlined />
@@ -86,6 +82,9 @@ export default function Transforming() {
                             company data or other band files
                         </p>
                     </Dragger>
+                </Grid>
+                <Grid item xs={12} sx={{ marginTop: 5 }}>
+                    <Button variant="outlined">Convert</Button>
                 </Grid>
             </Grid>
         </>
