@@ -27,6 +27,7 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
+import TextField from '@mui/material/TextField'
 
 const nodeTypes = { place: PlaceNode, transition: TransitionNode }
 
@@ -40,9 +41,17 @@ export default function PetriNetModelling() {
     const [showBackground, setShowBackground] = useState(false)
     const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([])
     const [edges, setEdges, onEdgesChange] = useEdgesState([])
-    const [openPlaceDialog, setOpenPlaceDialog] = useState(false)
+    const [selectedNode, setSelectedNode] = useState<Node | null>(null)
 
     const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [])
+    /*     const onRemoveEdge = useCallback(
+        (id: string) => setEdges((eds) => eds.filter((ed) => ed.id !== id)),
+        []
+    ) */
+    const onRemoveNode = (id: string) => {
+        setNodes(nodes.filter((node) => node.id !== id))
+        setEdges(edges.filter((edge) => edge.source != id && edge.target != id))
+    }
 
     const onDragOver = useCallback((event: any) => {
         event.preventDefault()
@@ -71,7 +80,7 @@ export default function PetriNetModelling() {
                     id: getId(),
                     type,
                     position,
-                    data: { label: `${type} node`, setOpenDialog: setOpenPlaceDialog },
+                    data: { label: `${type} node`, setSelectedNode: setSelectedNode },
                 }
 
                 setNodes((nds) => nds.concat(newNode))
@@ -120,12 +129,12 @@ export default function PetriNetModelling() {
             </ReactFlowProvider>
 
             {/* Modals/Dialogs */}
-            <Dialog open={openPlaceDialog} onClose={() => setOpenPlaceDialog(false)}>
+            <Dialog open={!!selectedNode} onClose={() => setSelectedNode(null)}>
                 <DialogTitle style={{ cursor: 'move' }}>
-                    Subscribe
+                    {selectedNode?.data.title ? selectedNode?.data.title : selectedNode?.data.label}
                     <IconButton
                         aria-label="close"
-                        onClick={() => setOpenPlaceDialog(false)}
+                        onClick={() => setSelectedNode(null)}
                         sx={{
                             position: 'absolute',
                             right: 8,
@@ -137,14 +146,27 @@ export default function PetriNetModelling() {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        To subscribe to this website, please enter your email address here. We will
-                        send updates occasionally.
+                        <TextField
+                            id="outlined-basic"
+                            label="Title"
+                            variant="outlined"
+                            value={selectedNode?.data.title}
+                        />
+                        <TextField
+                            id="outlined-basic"
+                            label="Tokens"
+                            type="number"
+                            variant="outlined"
+                        />
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <IconButton
                         sx={{ margin: '0px 5px 0px 5px' }}
-                        onClick={() => console.log('delete')}
+                        onClick={() => {
+                            selectedNode ? onRemoveNode(selectedNode.id) : null
+                            setSelectedNode(null)
+                        }}
                     >
                         <DeleteIcon />
                     </IconButton>
