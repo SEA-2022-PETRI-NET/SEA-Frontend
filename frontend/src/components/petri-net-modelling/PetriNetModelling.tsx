@@ -9,39 +9,28 @@ import ReactFlow, {
     Node,
     ReactFlowProvider,
     ReactFlowInstance,
+    Edge,
+    MarkerType,
 } from 'react-flow-renderer'
 import Grid4x4Icon from '@mui/icons-material/Grid4x4'
 import SideBar from './Sidebar'
 import ActionButtons from './ActionButtons'
+import PlaceNode from './PlaceNode'
+import TransitionNode from './TransitionNode'
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+} from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import DeleteIcon from '@mui/icons-material/Delete'
 
-const initialNodes: Node[] = [
-    {
-        id: '1',
-        type: 'input',
-        data: { label: 'Input Node' },
-        position: { x: 250, y: 25 },
-    },
+const nodeTypes = { place: PlaceNode, transition: TransitionNode }
 
-    {
-        id: '2',
-        // you can also pass a React component as a label
-        data: { label: <div>Default Node</div> },
-        position: { x: 100, y: 125 },
-    },
-    {
-        id: '3',
-        type: 'output',
-        data: { label: 'Output Node' },
-        position: { x: 250, y: 250 },
-    },
-]
-
-const initialEdges = [
-    { id: 'e1-2', source: '1', target: '2' },
-    { id: 'e2-3', source: '2', target: '3', animated: true },
-]
-
-let id = 4
+let id = 1
 const getId = () => `${id++}`
 
 export default function PetriNetModelling() {
@@ -49,8 +38,9 @@ export default function PetriNetModelling() {
     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null)
     const [openDrawer, setOpenDrawer] = useState(false)
     const [showBackground, setShowBackground] = useState(false)
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(initialNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([])
+    const [edges, setEdges, onEdgesChange] = useEdgesState([])
+    const [openPlaceDialog, setOpenPlaceDialog] = useState(false)
 
     const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [])
 
@@ -81,7 +71,7 @@ export default function PetriNetModelling() {
                     id: getId(),
                     type,
                     position,
-                    data: { label: `${type} node` },
+                    data: { label: `${type} node`, setOpenDialog: setOpenPlaceDialog },
                 }
 
                 setNodes((nds) => nds.concat(newNode))
@@ -114,6 +104,7 @@ export default function PetriNetModelling() {
                         onDragOver={onDragOver}
                         fitView
                         style={{ height: '100vh' }}
+                        nodeTypes={nodeTypes}
                     >
                         <Controls style={{ bottom: '40px', right: '30px', left: 'auto' }}>
                             <ControlButton
@@ -127,6 +118,38 @@ export default function PetriNetModelling() {
                     </ReactFlow>
                 </div>
             </ReactFlowProvider>
+
+            {/* Modals/Dialogs */}
+            <Dialog open={openPlaceDialog} onClose={() => setOpenPlaceDialog(false)}>
+                <DialogTitle style={{ cursor: 'move' }}>
+                    Subscribe
+                    <IconButton
+                        aria-label="close"
+                        onClick={() => setOpenPlaceDialog(false)}
+                        sx={{
+                            position: 'absolute',
+                            right: 8,
+                            top: 8,
+                        }}
+                    >
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        To subscribe to this website, please enter your email address here. We will
+                        send updates occasionally.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <IconButton
+                        sx={{ margin: '0px 5px 0px 5px' }}
+                        onClick={() => console.log('delete')}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </DialogActions>
+            </Dialog>
         </>
     )
 }

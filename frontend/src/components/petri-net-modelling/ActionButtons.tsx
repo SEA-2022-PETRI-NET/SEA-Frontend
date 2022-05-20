@@ -39,7 +39,7 @@ export default function ActionButtons({ style }: ActionButtons) {
                     <CheckCircleTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
-            <Tooltip title="Delete">
+            <Tooltip title="Simulate">
                 <IconButton sx={{ margin: '0px 5px 0px 0px' }}>
                     <PlayArrowTwoToneIcon sx={{ color: 'green' }} />
                 </IconButton>

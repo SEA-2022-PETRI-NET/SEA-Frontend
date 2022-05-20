@@ -89,7 +89,7 @@ export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBar
                     <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
                         <div
                             className="dndnode input"
-                            onDragStart={(event) => onDragStart(event, 'input')}
+                            onDragStart={(event) => onDragStart(event, 'place')}
                             draggable
                             style={{ display: 'flex', flexDirection: 'row' }}
                         >
@@ -108,7 +108,7 @@ export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBar
                     <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
                         <div
                             className="dndnode input"
-                            onDragStart={(event) => onDragStart(event, 'input')}
+                            onDragStart={(event) => onDragStart(event, 'transition')}
                             draggable
                             style={{ display: 'flex', flexDirection: 'row' }}
                         >
