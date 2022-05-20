@@ -43,14 +43,17 @@ export default function PetriNetModelling() {
     const [edges, setEdges, onEdgesChange] = useEdgesState([])
     const [selectedNode, setSelectedNode] = useState<Node | null>(null)
 
-    const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [])
+    const onConnect = useCallback(
+        (params: any) => setEdges((eds) => addEdge(params, eds)),
+        [setEdges]
+    )
     /*     const onRemoveEdge = useCallback(
         (id: string) => setEdges((eds) => eds.filter((ed) => ed.id !== id)),
         []
     ) */
     const onRemoveNode = (id: string) => {
         setNodes(nodes.filter((node) => node.id !== id))
-        setEdges(edges.filter((edge) => edge.source != id && edge.target != id))
+        setEdges(edges.filter((edge) => edge.source !== id && edge.target !== id))
     }
 
     const onDragOver = useCallback((event: any) => {
@@ -86,7 +89,7 @@ export default function PetriNetModelling() {
                 setNodes((nds) => nds.concat(newNode))
             }
         },
-        [reactFlowInstance]
+        [reactFlowInstance, setNodes]
     )
 
     return (
@@ -164,7 +167,7 @@ export default function PetriNetModelling() {
                     <IconButton
                         sx={{ margin: '0px 5px 0px 5px' }}
                         onClick={() => {
-                            selectedNode ? onRemoveNode(selectedNode.id) : null
+                            if (selectedNode) onRemoveNode(selectedNode.id)
                             setSelectedNode(null)
                         }}
                     >

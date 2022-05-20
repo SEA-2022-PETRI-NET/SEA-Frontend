@@ -1,8 +1,6 @@
-import { Box, Button } from '@mui/material'
-import { useCallback, memo } from 'react'
+import { Button } from '@mui/material'
+import { memo } from 'react'
 import { Node, Handle, Position } from 'react-flow-renderer'
-
-const handleStyle = { left: 10 }
 
 interface TransitionNodeProbs {
     setSelectedNode: (value: Node) => void
