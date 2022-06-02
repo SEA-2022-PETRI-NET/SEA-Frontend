@@ -5,13 +5,21 @@ import withResponseFormatterInterceptor from './util/with-response-formatter-int
 
 const backendConnection = withResponseFormatterInterceptor(
     axios.create({
-        baseURL: process.env.BACKEND_URL_PETRI_NET_MODELLING_ENGINE,
+        baseURL: process.env.REACT_APP_BACKEND_URL_MODEL_ENGINE,
         headers: { 'Access-Control-Allow-Origin': '*' },
     })
 )
 
-export const getPetriNetById = (id: number): Promise<Response<PetriNet>> =>
-    backendConnection.request({
+export const getPetriNetById = (id: number): Promise<Response<PetriNet>> => {
+    return backendConnection.request({
         url: `/${id}`,
         method: 'GET',
+    })
+}
+
+export const savePetriNet = (petriNet: PetriNet): Promise<Response<number>> =>
+    backendConnection.request({
+        url: '',
+        method: 'POST',
+        data: {},
     })

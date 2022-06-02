@@ -6,6 +6,7 @@ import SaveIcon from '@mui/icons-material/Save'
 import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone'
 import FileDownloadTwoToneIcon from '@mui/icons-material/FileDownloadTwoTone'
 import UploadTwoToneIcon from '@mui/icons-material/UploadTwoTone'
+import { getPetriNetById } from '../../api/petri-net-modelling'
 
 interface ActionButtons {
     style?: React.CSSProperties | undefined
@@ -20,7 +21,10 @@ export default function ActionButtons({ style }: ActionButtons) {
                 </IconButton>
             </Tooltip>
             <Tooltip title="Save">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton
+                    onClick={() => getPetriNetById(1).then((response) => console.log(response))}
+                    sx={{ margin: '0px 5px 0px 5px' }}
+                >
                     <SaveIcon />
                 </IconButton>
             </Tooltip>
