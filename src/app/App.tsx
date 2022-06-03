@@ -7,6 +7,8 @@ import { Routes, Route, NavLink } from 'react-router-dom'
 import { Button } from '@mui/material'
 import PetriNetModelling from '../components/petri-net-modelling/PetriNetModelling'
 import Transforming from '../components/Transforming'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
     return (
@@ -48,6 +50,17 @@ function App() {
                     <Route path="about" element={<h1>about</h1>} />
                 </Routes>
             </Box>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
         </>
     )
 }
