@@ -10,7 +10,7 @@ import ReactFlow, {
     ReactFlowProvider,
     ReactFlowInstance,
     Edge,
-    MarkerType,
+    Connection,
 } from 'react-flow-renderer'
 import Grid4x4Icon from '@mui/icons-material/Grid4x4'
 import SideBar from './Sidebar'
@@ -33,6 +33,7 @@ const nodeTypes = { place: PlaceNode, transition: TransitionNode }
 
 let id = 1
 const getId = () => `${id++}`
+const idToType = new Map()
 
 export default function PetriNetModelling() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null)
@@ -43,8 +44,22 @@ export default function PetriNetModelling() {
     const [edges, setEdges, onEdgesChange] = useEdgesState([])
     const [selectedNode, setSelectedNode] = useState<Node | null>(null)
 
+    const isValidConnection = (connection: Connection) =>
+        typeof connection.source !== typeof connection.target
+
     const onConnect = useCallback(
-        (params: any) => setEdges((eds) => addEdge(params, eds)),
+        (params: Connection | Edge) =>
+            setEdges((eds) => {
+                const edge: Connection | Edge = {
+                    ...params,
+                    animated: true,
+                }
+                if (idToType.get(edge.source) !== idToType.get(edge.target)) {
+                    return addEdge(edge, eds)
+                } else {
+                    return eds
+                }
+            }),
         [setEdges]
     )
     /*     const onRemoveEdge = useCallback(
@@ -74,6 +89,7 @@ export default function PetriNetModelling() {
                 if (typeof type === 'undefined' || !type) {
                     return
                 }
+                idToType.set(id.toString(), type)
 
                 const position = reactFlowInstance.project({
                     x: event.clientX - reactFlowBounds?.left,

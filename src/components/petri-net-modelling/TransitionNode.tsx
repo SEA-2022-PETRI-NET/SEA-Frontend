@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import { memo } from 'react'
-import { Node, Handle, Position } from 'react-flow-renderer'
+import { Node, Handle, Position, Connection } from 'react-flow-renderer'
 
 interface TransitionNodeProbs {
     setSelectedNode: (value: Node) => void
