@@ -10,13 +10,11 @@ const backendConnection = withResponseFormatterInterceptor(
     })
 )
 
-export const getPetriNetById = (id: number): Promise<Response<PetriNet>> => {
-    console.log(process.env.REACT_APP_BACKEND_URL_MODEL_ENGINE)
-    return backendConnection.request({
+export const getPetriNetById = (id: number): Promise<Response<PetriNet>> =>
+    backendConnection.request({
         url: `/${id}`,
         method: 'GET',
     })
-}
 
 export const savePetriNet = (petriNet: PetriNet): Promise<Response<number>> =>
     backendConnection.request({
