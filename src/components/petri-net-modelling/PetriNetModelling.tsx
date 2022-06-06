@@ -44,7 +44,10 @@ export default function PetriNetModelling() {
     const [selectedNode, setSelectedNode] = useState<Node | null>(null)
 
     const onConnect = useCallback(
-        (params: any) => setEdges((eds) => addEdge(params, eds)),
+        (params: any) => {
+            params.id = getId()
+            setEdges((eds) => addEdge(params, eds))
+        },
         [setEdges]
     )
     /*     const onRemoveEdge = useCallback(
@@ -102,6 +105,11 @@ export default function PetriNetModelling() {
                     top: '75px',
                     right: '40px',
                 }}
+                nodes={nodes}
+                edges={edges}
+                setNodes={setNodes}
+                setEdges={setEdges}
+                setSelectedNode={setSelectedNode}
             />
             <ReactFlowProvider>
                 <div className="reactflow-wrapper" ref={reactFlowWrapper}>

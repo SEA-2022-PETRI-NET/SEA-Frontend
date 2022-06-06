@@ -1,5 +1,9 @@
 export interface PetriNet {
-    id: number
+    id: number,
+    name: string,
+    arcs: Arc[],
+    places: Place[],
+    transitions: Transition[]
 }
 
 export enum ArcType {
@@ -9,8 +13,22 @@ export enum ArcType {
 }
 
 export interface Arc {
-    type: ArcType
-    weight: number
+    id: number,
+    sourceNode: number,
+    targetNode: number
+    //type: ArcType
+    //weight: number
 }
 
-export interface Transition {}
+export interface Place {
+    id: number,
+    name: string,
+    placeId: number,
+    numberOfTokens: number
+}
+
+export interface Transition { 
+    id: number,
+    transitionId: number,
+    name: string
+}
