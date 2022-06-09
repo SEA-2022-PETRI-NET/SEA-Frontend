@@ -37,7 +37,7 @@ export default function ActionButtons({
     setSelectedNode,
 }: ActionButtons) {
     const [modelDb, setModelDb] = useState<PetriNet | null>(null)
-    const [ulpoadModalOpen, setUploadModalOpen] = useState(false)
+    const [uploadModalOpen, setUploadModalOpen] = useState(false)
 
     const handleClickUpload = () => {
         setUploadModalOpen(true)
@@ -75,7 +75,6 @@ export default function ActionButtons({
             }
         })
         edges.forEach(function (edge: Edge<any>) {
-            console.log(edge)
             const arc = {} as Arc
             arc.id = Number(edge.id)
             arc.sourceNode = Number(edge.source)
@@ -172,9 +171,24 @@ export default function ActionButtons({
                     <UploadTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
-            <UploadPetriNetDialog open={ulpoadModalOpen} onClose={handleCloseUploadModal} />
+            <UploadPetriNetDialog open={uploadModalOpen} onClose={handleCloseUploadModal} />
             <Tooltip title="Download">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton
+                    onClick={async () => {
+                        const petriNet = getCurrentPetriNet()
+                        const blob = new Blob([JSON.stringify(petriNet)], {
+                            type: 'application/json',
+                        })
+                        const url = window.URL.createObjectURL(blob)
+                        const link = document.createElement('a')
+                        link.href = url
+                        link.download = petriNet.name + '.json'
+                        document.body.appendChild(link)
+                        link.click()
+                        link.parentNode!.removeChild(link)
+                    }}
+                    sx={{ margin: '0px 5px 0px 5px' }}
+                >
                     <FileDownloadTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
