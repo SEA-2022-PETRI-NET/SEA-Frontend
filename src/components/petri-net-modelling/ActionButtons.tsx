@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import { Tooltip } from '@mui/material'
 import PlayArrowTwoToneIcon from '@mui/icons-material/PlayArrowTwoTone'
@@ -10,6 +11,7 @@ import { getPetriNetById, savePetriNet } from '../../api/petri-net-modelling'
 import { toast } from 'react-toastify'
 import { PetriNet, Place, Transition, Arc } from '../../models/PetrinetModels'
 import ReactFlow, { Node, Edge } from 'react-flow-renderer'
+import UploadPetriNetDialog from './UploadPetriNetDialog'
 
 interface ActionButtons {
     style?: React.CSSProperties | undefined
@@ -28,6 +30,16 @@ export default function ActionButtons({
     setEdges,
     setSelectedNode,
 }: ActionButtons) {
+    const [ulpoadModalOpen, setUploadModalOpen] = useState(false)
+
+    const handleClickUpload = () => {
+        setUploadModalOpen(true)
+    }
+
+    const handleCloseUploadModal = () => {
+        setUploadModalOpen(false)
+    }
+
     const getCurrentPetriNet = () => {
         const petriNet = {} as PetriNet
         petriNet.id = 0
@@ -127,10 +139,11 @@ export default function ActionButtons({
                 </IconButton>
             </Tooltip>
             <Tooltip title="Upload">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton sx={{ margin: '0px 5px 0px 5px' }} onClick={handleClickUpload}>
                     <UploadTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
+            <UploadPetriNetDialog open={ulpoadModalOpen} onClose={handleCloseUploadModal} />
             <Tooltip title="Download">
                 <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
                     <FileDownloadTwoToneIcon sx={{ color: 'blue' }} />
