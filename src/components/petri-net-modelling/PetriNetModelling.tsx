@@ -118,6 +118,11 @@ export default function PetriNetModelling() {
                     top: '75px',
                     right: '40px',
                 }}
+                nodes={nodes}
+                edges={edges}
+                setNodes={setNodes}
+                setEdges={setEdges}
+                setSelectedNode={setSelectedNode}
             />
             <ReactFlowProvider>
                 <div className="reactflow-wrapper" ref={reactFlowWrapper}>
