@@ -9,6 +9,7 @@ import PetriNetModelling from '../components/petri-net-modelling/PetriNetModelli
 import Transforming from '../components/Transforming'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Overview from '../components/Overview'
 
 function App() {
     return (
@@ -33,6 +34,9 @@ function App() {
                         SEA
                     </Typography>
                     <Button sx={{ color: 'white' }} component={NavLink} to={'/'}>
+                        Overview
+                    </Button>
+                    <Button sx={{ color: 'white' }} component={NavLink} to={'/modelling'}>
                         Modelling
                     </Button>
                     <Button sx={{ color: 'white' }} component={NavLink} to={'/transformer'}>
@@ -45,7 +49,8 @@ function App() {
             </Box>
             <Box>
                 <Routes>
-                    <Route path="/" element={<PetriNetModelling />} />
+                    <Route path="/" element={<Overview />} />
+                    <Route path="/modelling" element={<PetriNetModelling />} />
                     <Route path="/transformer" element={<Transforming />} />
                     <Route path="about" element={<h1>about</h1>} />
                 </Routes>

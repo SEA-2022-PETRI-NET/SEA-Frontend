@@ -12,13 +12,19 @@ const backendConnection = withResponseFormatterInterceptor(
 
 export const getPetriNetById = (id: number): Promise<Response<PetriNet>> =>
     backendConnection.request({
-        url: `/${id}`,
+        url: `/Model/${id}`,
+        method: 'GET',
+    })
+
+export const getPetriNets = (): Promise<Response<PetriNet[]>> =>
+    backendConnection.request({
+        url: '/Model',
         method: 'GET',
     })
 
 export const savePetriNet = (petriNet: PetriNet): Promise<Response<number>> =>
     backendConnection.request({
-        url: '',
+        url: '/Model',
         method: 'POST',
         data: {},
     })
