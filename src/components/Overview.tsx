@@ -33,22 +33,6 @@ export default function Overview() {
 
     return (
         <>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-
-            <h1>heyhey</h1>
-
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
-            <h1>heyhey</h1>
             <List>
                 {petriNets.map((petriNet) => (
                     <h1 key={petriNet.id}>{petriNet.id}</h1>

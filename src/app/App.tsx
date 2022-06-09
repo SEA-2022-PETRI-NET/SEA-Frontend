@@ -51,6 +51,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Overview />} />
                     <Route path="/modelling" element={<PetriNetModelling />} />
+                    <Route path="/modelling/:id/simulate" element={<Overview />} />
                     <Route path="/transformer" element={<Transforming />} />
                     <Route path="about" element={<h1>about</h1>} />
                 </Routes>
