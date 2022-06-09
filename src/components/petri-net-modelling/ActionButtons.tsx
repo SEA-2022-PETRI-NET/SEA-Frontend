@@ -6,10 +6,17 @@ import SaveIcon from '@mui/icons-material/Save'
 import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone'
 import FileDownloadTwoToneIcon from '@mui/icons-material/FileDownloadTwoTone'
 import UploadTwoToneIcon from '@mui/icons-material/UploadTwoTone'
-import { getPetriNetById, savePetriNet } from '../../api/petri-net-modelling'
+import {
+    getPetriNetById,
+    savePetriNet,
+    updatePetriNet,
+    validatePetriNet,
+    deletePetriNet,
+} from '../../api/petri-net-modelling'
 import { toast } from 'react-toastify'
 import { PetriNet, Place, Transition, Arc } from '../../models/PetrinetModels'
 import ReactFlow, { Node, Edge } from 'react-flow-renderer'
+import { useState } from 'react'
 
 interface ActionButtons {
     style?: React.CSSProperties | undefined
@@ -28,6 +35,8 @@ export default function ActionButtons({
     setEdges,
     setSelectedNode,
 }: ActionButtons) {
+    const [modelDb, setModelDb] = useState<PetriNet | null>(null)
+
     const getCurrentPetriNet = () => {
         const petriNet = {} as PetriNet
         petriNet.id = 0
@@ -101,7 +110,22 @@ export default function ActionButtons({
     return (
         <div style={style}>
             <Tooltip title="Delete">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton
+                    onClick={async () => {
+                        if (modelDb === null) {
+                            toast.error('No model to be deleted')
+                            return
+                        }
+                        const response = await deletePetriNet(modelDb.id)
+                        if (response.successful) {
+                            setModelDb(null)
+                            toast.success(response.status)
+                        } else {
+                            toast.error(response.message)
+                        }
+                    }}
+                    sx={{ margin: '0px 5px 0px 5px' }}
+                >
                     <DeleteIcon />
                 </IconButton>
             </Tooltip>
@@ -114,8 +138,15 @@ export default function ActionButtons({
                         }*/
                         const petriNet = getCurrentPetriNet()
                         //console.log(JSON.stringify(petriNet))
-                        const response = await savePetriNet(petriNet)
+                        let response
+                        if (modelDb === null) {
+                            response = await savePetriNet(petriNet)
+                        } else {
+                            petriNet.id = modelDb.id
+                            response = await updatePetriNet(petriNet)
+                        }
                         if (response.successful) {
+                            setModelDb(response.data)
                             toast.success(response.status)
                         } else {
                             toast.error(response.message)
@@ -137,7 +168,18 @@ export default function ActionButtons({
                 </IconButton>
             </Tooltip>
             <Tooltip title="Validate">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton
+                    onClick={async () => {
+                        const petriNet = getCurrentPetriNet()
+                        const response = await validatePetriNet(petriNet)
+                        if (response.successful) {
+                            toast.success(response.status)
+                        } else {
+                            toast.error(response.message)
+                        }
+                    }}
+                    sx={{ margin: '0px 5px 0px 5px' }}
+                >
                     <CheckCircleTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
