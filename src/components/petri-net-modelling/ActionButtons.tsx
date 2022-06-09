@@ -118,7 +118,6 @@ export default function ActionButtons({
                         if (response.successful) {
                             toast.success(response.status)
                         } else {
-                            // TODO: message is always just "Something went wrong"
                             toast.error(response.message)
                         }
                     }}

@@ -26,5 +26,5 @@ export const savePetriNet = (petriNet: PetriNet): Promise<Response<number>> =>
     backendConnection.request({
         url: '/Model',
         method: 'POST',
-        data: {},
+        data: petriNet,
     })
