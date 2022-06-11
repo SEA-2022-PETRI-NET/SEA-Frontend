@@ -7,7 +7,13 @@ import SaveIcon from '@mui/icons-material/Save'
 import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone'
 import FileDownloadTwoToneIcon from '@mui/icons-material/FileDownloadTwoTone'
 import UploadTwoToneIcon from '@mui/icons-material/UploadTwoTone'
-import { getPetriNetById, savePetriNet } from '../../api/petri-net-modelling'
+import {
+    getPetriNetById,
+    savePetriNet,
+    updatePetriNet,
+    validatePetriNet,
+    deletePetriNet,
+} from '../../api/petri-net-modelling'
 import { toast } from 'react-toastify'
 import { PetriNet, Place, Transition, Arc } from '../../models/PetrinetModels'
 import ReactFlow, { Node, Edge } from 'react-flow-renderer'
@@ -30,7 +36,8 @@ export default function ActionButtons({
     setEdges,
     setSelectedNode,
 }: ActionButtons) {
-    const [ulpoadModalOpen, setUploadModalOpen] = useState(false)
+    const [modelDb, setModelDb] = useState<PetriNet | null>(null)
+    const [uploadModalOpen, setUploadModalOpen] = useState(false)
 
     const handleClickUpload = () => {
         setUploadModalOpen(true)
@@ -68,7 +75,6 @@ export default function ActionButtons({
             }
         })
         edges.forEach(function (edge: Edge<any>) {
-            console.log(edge)
             const arc = {} as Arc
             arc.id = Number(edge.id)
             arc.sourceNode = Number(edge.source)
@@ -113,7 +119,22 @@ export default function ActionButtons({
     return (
         <div style={style}>
             <Tooltip title="Delete">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton
+                    onClick={async () => {
+                        if (modelDb === null) {
+                            toast.error('No model to be deleted')
+                            return
+                        }
+                        const response = await deletePetriNet(modelDb.id)
+                        if (response.successful) {
+                            setModelDb(null)
+                            toast.success(response.status)
+                        } else {
+                            toast.error(response.message)
+                        }
+                    }}
+                    sx={{ margin: '0px 5px 0px 5px' }}
+                >
                     <DeleteIcon />
                 </IconButton>
             </Tooltip>
@@ -126,8 +147,15 @@ export default function ActionButtons({
                         }*/
                         const petriNet = getCurrentPetriNet()
                         //console.log(JSON.stringify(petriNet))
-                        const response = await savePetriNet(petriNet)
+                        let response
+                        if (modelDb === null) {
+                            response = await savePetriNet(petriNet)
+                        } else {
+                            petriNet.id = modelDb.id
+                            response = await updatePetriNet(petriNet)
+                        }
                         if (response.successful) {
+                            setModelDb(response.data)
                             toast.success(response.status)
                         } else {
                             toast.error(response.message)
@@ -143,14 +171,40 @@ export default function ActionButtons({
                     <UploadTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
-            <UploadPetriNetDialog open={ulpoadModalOpen} onClose={handleCloseUploadModal} />
+            <UploadPetriNetDialog open={uploadModalOpen} onClose={handleCloseUploadModal} />
             <Tooltip title="Download">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton
+                    onClick={async () => {
+                        const petriNet = getCurrentPetriNet()
+                        const blob = new Blob([JSON.stringify(petriNet)], {
+                            type: 'application/json',
+                        })
+                        const url = window.URL.createObjectURL(blob)
+                        const link = document.createElement('a')
+                        link.href = url
+                        link.download = petriNet.name + '.json'
+                        document.body.appendChild(link)
+                        link.click()
+                        link.parentNode!.removeChild(link)
+                    }}
+                    sx={{ margin: '0px 5px 0px 5px' }}
+                >
                     <FileDownloadTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
             <Tooltip title="Validate">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }}>
+                <IconButton
+                    onClick={async () => {
+                        const petriNet = getCurrentPetriNet()
+                        const response = await validatePetriNet(petriNet)
+                        if (response.successful) {
+                            toast.success(response.status)
+                        } else {
+                            toast.error(response.message)
+                        }
+                    }}
+                    sx={{ margin: '0px 5px 0px 5px' }}
+                >
                     <CheckCircleTwoToneIcon sx={{ color: 'blue' }} />
                 </IconButton>
             </Tooltip>
