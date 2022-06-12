@@ -24,7 +24,8 @@ export interface Place {
     id: number
     name: string
     placeId: number
-    numberOfTokens: number
+    numberOfTokens?: number
+    tokens?: Token[]
     position: Position
 }
 
@@ -38,4 +39,8 @@ export interface Transition {
 export interface Position {
     x: number
     y: number
+}
+
+export interface Token {
+    id: number
 }
