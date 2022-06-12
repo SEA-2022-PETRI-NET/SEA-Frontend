@@ -8,7 +8,6 @@ import CheckCircleTwoToneIcon from '@mui/icons-material/CheckCircleTwoTone'
 import FileDownloadTwoToneIcon from '@mui/icons-material/FileDownloadTwoTone'
 import UploadTwoToneIcon from '@mui/icons-material/UploadTwoTone'
 import {
-    getPetriNetById,
     savePetriNet,
     updatePetriNet,
     validatePetriNet,
@@ -16,72 +15,70 @@ import {
 } from '../../api/petri-net-modelling'
 import { toast } from 'react-toastify'
 import { PetriNet, Place, Transition, Arc } from '../../models/PetrinetModels'
-import ReactFlow, { Node, Edge } from 'react-flow-renderer'
-import UploadPetriNetDialog from './UploadPetriNetDialog'
+import { Node, Edge } from 'react-flow-renderer'
+import UploadPetriNetDialog from './modals/UploadPetriNetDialog'
+import { useNavigate, useParams } from 'react-router-dom'
+import { EdgeDataProbs, NodeDataProbs } from './PetriNetModelling'
+import PlaceNode from './PlaceNode'
+import TransitionNode from './TransitionNode'
 
 interface ActionButtons {
     style?: React.CSSProperties | undefined
-    nodes: Node<Node<any>[]>[]
-    edges: Edge<any>[]
-    setNodes: any
-    setEdges: any
-    setSelectedNode: any
+    nodes: Node<NodeDataProbs>[]
+    edges: Edge<EdgeDataProbs>[]
+    petriNetId: string
+    petriNetName: string
+    setNodes: (nodes: Node<NodeDataProbs>[]) => void
+    setEdges: (edges: Edge<EdgeDataProbs>[]) => void
+    setSelectedNode: (value: Node) => void
 }
 
 export default function ActionButtons({
     style,
     nodes,
     edges,
+    petriNetName,
+    petriNetId,
     setNodes,
     setEdges,
     setSelectedNode,
 }: ActionButtons) {
-    const [modelDb, setModelDb] = useState<PetriNet | null>(null)
     const [uploadModalOpen, setUploadModalOpen] = useState(false)
-
-    const handleClickUpload = () => {
-        setUploadModalOpen(true)
-    }
-
-    const handleCloseUploadModal = () => {
-        setUploadModalOpen(false)
-    }
+    const navigate = useNavigate()
 
     const getCurrentPetriNet = () => {
-        const petriNet = {} as PetriNet
-        petriNet.id = 0
-        // TODO: Retrieve name of PetriNet
-        petriNet.name = 'PetriNetTest'
-        petriNet.arcs = []
-        petriNet.places = []
-        petriNet.transitions = []
-        nodes.forEach(function (node: Node<Node<any>[]>) {
-            if (node.type === 'place') {
-                const place = {} as Place
-                place.placeId = Number(node.id)
-                const placeData: any = node.data
-                place.name = placeData.title ?? placeData.label
-                place.name += place.placeId
-                // TODO: retrieve number of tokens
-                place.numberOfTokens = 0
-                petriNet.places.push(place)
-            } else {
-                const transition = {} as Transition
-                transition.transitionId = Number(node.id)
-                const transData: any = node.data
-                transition.name = transData.title ?? transData.label
-                transition.name += transition.transitionId
-                petriNet.transitions.push(transition)
+        const arcs: Arc[] = []
+        const places: Place[] = []
+        const transitions: Transition[] = []
+        nodes.forEach(function (node: Node<NodeDataProbs>) {
+            if (node.type === PlaceNode.displayName) {
+                places.push({
+                    placeId: Number(node.id),
+                    name: node.data.name,
+                    numberOfTokens: node.data.numberOfTokens,
+                    tokens: node.data.tokens,
+                } as Place)
+            }
+            if (node.type === TransitionNode.displayName) {
+                transitions.push({
+                    transitionId: Number(node.id),
+                    name: node.data.name,
+                } as Transition)
             }
         })
-        edges.forEach(function (edge: Edge<any>) {
-            const arc = {} as Arc
-            arc.id = Number(edge.id)
-            arc.sourceNode = Number(edge.source)
-            arc.targetNode = Number(edge.target)
-            petriNet.arcs.push(arc)
+        edges.forEach((edge: Edge<EdgeDataProbs>) => {
+            arcs.push({
+                id: Number(edge.id),
+                sourceNode: Number(edge.source),
+                targetNode: Number(edge.target),
+            } as Arc)
         })
-        return petriNet
+        return {
+            name: petriNetName,
+            arcs,
+            places,
+            transitions,
+        } as PetriNet
     }
 
     const loadPetriNet = (petriNet: PetriNet) => {
@@ -116,103 +113,107 @@ export default function ActionButtons({
         setEdges(edges)
     }
 
+    const onSavePetriNet = async () => {
+        const petriNet = getCurrentPetriNet()
+        if (petriNetId === 'new') {
+            const response = await savePetriNet(petriNet)
+            if (response.successful) {
+                toast.success('Saved sucessfully')
+                navigate(`/modelling/${response.data.id}`)
+            } else {
+                toast.error(response.message)
+            }
+        } else {
+            const response = await updatePetriNet(petriNetId, petriNet)
+            if (response.successful) {
+                toast.success('Saved sucessfully')
+            } else {
+                toast.error(response.message)
+            }
+        }
+    }
+
+    const onDownloadPetriNet = async () => {
+        const petriNet = getCurrentPetriNet()
+        const blob = new Blob([JSON.stringify(petriNet)], {
+            type: 'application/json',
+        })
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = petriNet.name + '.json'
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode?.removeChild(link)
+    }
+
+    const onValidatePetriNet = async () => {
+        const petriNet = getCurrentPetriNet()
+        const response = await validatePetriNet(petriNet)
+        if (response.successful) {
+            toast.success('Petri net is valid')
+        } else {
+            toast.error(response.message)
+        }
+    }
+
+    const onDeletePetriNet = async () => {
+        if (petriNetId === 'new') {
+            navigate('/')
+        } else {
+            const response = await deletePetriNet(Number(petriNetId))
+            if (response.successful) {
+                toast.success(response.status)
+                navigate('/')
+            } else {
+                toast.error(response.message)
+            }
+        }
+    }
+
     return (
-        <div style={style}>
-            <Tooltip title="Delete">
-                <IconButton
-                    onClick={async () => {
-                        if (modelDb === null) {
-                            toast.error('No model to be deleted')
-                            return
-                        }
-                        const response = await deletePetriNet(modelDb.id)
-                        if (response.successful) {
-                            setModelDb(null)
-                            toast.success(response.status)
-                        } else {
-                            toast.error(response.message)
-                        }
-                    }}
-                    sx={{ margin: '0px 5px 0px 5px' }}
-                >
-                    <DeleteIcon />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title="Save">
-                <IconButton
-                    onClick={async () => {
-                        /*const response1 = await getPetriNetById(1)
-                        if (response1.successful) {
-                            console.log(response1.data)
-                        }*/
-                        const petriNet = getCurrentPetriNet()
-                        //console.log(JSON.stringify(petriNet))
-                        let response
-                        if (modelDb === null) {
-                            response = await savePetriNet(petriNet)
-                        } else {
-                            petriNet.id = modelDb.id
-                            response = await updatePetriNet(petriNet)
-                        }
-                        if (response.successful) {
-                            setModelDb(response.data)
-                            toast.success(response.status)
-                        } else {
-                            toast.error(response.message)
-                        }
-                    }}
-                    sx={{ margin: '0px 5px 0px 5px' }}
-                >
-                    <SaveIcon />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title="Upload">
-                <IconButton sx={{ margin: '0px 5px 0px 5px' }} onClick={handleClickUpload}>
-                    <UploadTwoToneIcon sx={{ color: 'blue' }} />
-                </IconButton>
-            </Tooltip>
-            <UploadPetriNetDialog open={uploadModalOpen} onClose={handleCloseUploadModal} />
-            <Tooltip title="Download">
-                <IconButton
-                    onClick={async () => {
-                        const petriNet = getCurrentPetriNet()
-                        const blob = new Blob([JSON.stringify(petriNet)], {
-                            type: 'application/json',
-                        })
-                        const url = window.URL.createObjectURL(blob)
-                        const link = document.createElement('a')
-                        link.href = url
-                        link.download = petriNet.name + '.json'
-                        document.body.appendChild(link)
-                        link.click()
-                        link.parentNode!.removeChild(link)
-                    }}
-                    sx={{ margin: '0px 5px 0px 5px' }}
-                >
-                    <FileDownloadTwoToneIcon sx={{ color: 'blue' }} />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title="Validate">
-                <IconButton
-                    onClick={async () => {
-                        const petriNet = getCurrentPetriNet()
-                        const response = await validatePetriNet(petriNet)
-                        if (response.successful) {
-                            toast.success(response.status)
-                        } else {
-                            toast.error(response.message)
-                        }
-                    }}
-                    sx={{ margin: '0px 5px 0px 5px' }}
-                >
-                    <CheckCircleTwoToneIcon sx={{ color: 'blue' }} />
-                </IconButton>
-            </Tooltip>
-            <Tooltip title="Simulate">
-                <IconButton sx={{ margin: '0px 5px 0px 0px' }}>
-                    <PlayArrowTwoToneIcon sx={{ color: 'green' }} />
-                </IconButton>
-            </Tooltip>
-        </div>
+        <>
+            <div style={style}>
+                <Tooltip title="Delete">
+                    <IconButton onClick={onDeletePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                        <DeleteIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Save">
+                    <IconButton onClick={onSavePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                        <SaveIcon />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Upload">
+                    <IconButton
+                        sx={{ margin: '0px 5px 0px 5px' }}
+                        onClick={() => setUploadModalOpen(true)}
+                    >
+                        <UploadTwoToneIcon sx={{ color: 'blue' }} />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Download">
+                    <IconButton onClick={onDownloadPetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                        <FileDownloadTwoToneIcon sx={{ color: 'blue' }} />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Validate">
+                    <IconButton onClick={onValidatePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                        <CheckCircleTwoToneIcon sx={{ color: 'blue' }} />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Simulate">
+                    <IconButton sx={{ margin: '0px 5px 0px 0px' }}>
+                        <PlayArrowTwoToneIcon sx={{ color: 'green' }} />
+                    </IconButton>
+                </Tooltip>
+            </div>
+
+            {/* MODALS */}
+            <UploadPetriNetDialog
+                open={uploadModalOpen}
+                onClose={() => setUploadModalOpen(false)}
+            />
+        </>
     )
 }

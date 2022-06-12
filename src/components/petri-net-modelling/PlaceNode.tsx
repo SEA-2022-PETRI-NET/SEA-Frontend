@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import { memo } from 'react'
-import { Node, Handle, Position, Connection } from 'react-flow-renderer'
+import { Node, Handle, Position } from 'react-flow-renderer'
 
 interface PlaceNodeProbs {
     setSelectedNode: (value: Node) => void
@@ -24,16 +24,6 @@ const PlaceNode = memo(
                     type="target"
                     position={Position.Top}
                     style={{ background: '#555' }}
-                    onConnect={(params) =>
-                        console.log(
-                            'handle onConnect',
-                            params,
-                            'source: ',
-                            params.sourceHandle,
-                            ' | target: ',
-                            params.targetHandle
-                        )
-                    }
                     isConnectable={true}
                 />
                 <Button
@@ -63,7 +53,6 @@ const PlaceNode = memo(
                     type="source"
                     position={Position.Bottom}
                     style={{ background: '#555' }}
-                    onConnect={(params) => console.log('handle onConnect', params)}
                     isConnectable={true}
                 />
             </>
