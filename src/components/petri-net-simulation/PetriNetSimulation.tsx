@@ -35,7 +35,7 @@ let id = 1
 const getId = () => `${id++}`
 const idToType = new Map()
 
-export default function PetriNetModelling() {
+export default function PetriNetSimulation() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null)
     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null)
     const [openDrawer, setOpenDrawer] = useState(false)

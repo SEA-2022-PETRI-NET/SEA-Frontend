@@ -60,5 +60,5 @@ const TransitionNode = memo(
         )
     }
 )
-TransitionNode.displayName = 'TransitionNode'
+TransitionNode.displayName = 'transitionNode'
 export default TransitionNode

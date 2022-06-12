@@ -1,16 +1,18 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import ReactFlow, {
     Controls,
     Background,
     ControlButton,
     addEdge,
-    useNodesState,
-    useEdgesState,
     Node,
     ReactFlowProvider,
     ReactFlowInstance,
     Edge,
     Connection,
+    NodeChange,
+    applyNodeChanges,
+    applyEdgeChanges,
+    EdgeChange,
 } from 'react-flow-renderer'
 import Grid4x4Icon from '@mui/icons-material/Grid4x4'
 import SideBar from './Sidebar'
@@ -28,8 +30,11 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
 import TextField from '@mui/material/TextField'
+import { useParams } from 'react-router-dom'
+import { getPetriNetById } from '../../api/petri-net-modelling'
+import { toast } from 'react-toastify'
 
-const nodeTypes = { place: PlaceNode, transition: TransitionNode }
+const nodeTypes = { placeNode: PlaceNode, transitionNode: TransitionNode }
 
 let id = 1
 const getId = () => `${id++}`
@@ -40,12 +45,69 @@ export default function PetriNetModelling() {
     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null)
     const [openDrawer, setOpenDrawer] = useState(false)
     const [showBackground, setShowBackground] = useState(false)
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>([])
-    const [edges, setEdges, onEdgesChange] = useEdgesState([])
+    const [nodes, setNodes] = useState<Node[]>([])
+    const [edges, setEdges] = useState<Edge[]>([])
     const [selectedNode, setSelectedNode] = useState<Node | null>(null)
+
+    const { petriNetId } = useParams()
 
     const isValidConnection = (connection: Connection) =>
         typeof connection.source !== typeof connection.target
+
+    useEffect(() => {
+        const fetchPetriNet = async () => {
+            const response = await getPetriNetById(Number(petriNetId))
+            if (response.successful) {
+                const nodes = response.data.places.map((p) => {
+                    const position = p.position
+                        ? p.position
+                        : { x: Math.random() * 300, y: Math.random() * 300 }
+                    return {
+                        id: p.id.toString(),
+                        type: PlaceNode.displayName,
+                        position: position,
+                        data: {
+                            label: `${PlaceNode.displayName} node`,
+                            setSelectedNode: setSelectedNode,
+                        },
+                    } as Node
+                })
+                nodes.concat(
+                    response.data.transitions.map((t) => {
+                        const position = t.position
+                            ? t.position
+                            : { x: Math.random() * 300, y: Math.random() * 300 }
+                        return {
+                            id: t.id.toString(),
+                            type: TransitionNode.displayName,
+                            position: position,
+                            data: {
+                                label: `${PlaceNode.displayName} node`,
+                                setSelectedNode: setSelectedNode,
+                            },
+                        } as Node
+                    })
+                )
+                setNodes(nodes)
+                toast.success('Retrieved petri net')
+            } else {
+                toast.error('Could not retrieve petri net')
+            }
+        }
+        if (petriNetId !== 'new') {
+            fetchPetriNet()
+        }
+    }, [petriNetId])
+
+    const onNodesChange = useCallback(
+        (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+        [setNodes]
+    )
+
+    const onEdgesChange = useCallback(
+        (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+        [setEdges]
+    )
 
     const onConnect = useCallback(
         (params: Connection | Edge) =>
