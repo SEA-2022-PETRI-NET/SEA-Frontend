@@ -70,5 +70,5 @@ const PlaceNode = memo(
         )
     }
 )
-PlaceNode.displayName = 'PlaceNode'
+PlaceNode.displayName = 'placeNode'
 export default PlaceNode

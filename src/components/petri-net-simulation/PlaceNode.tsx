@@ -2,11 +2,11 @@ import { Button } from '@mui/material'
 import { memo } from 'react'
 import { Node, Handle, Position, Connection } from 'react-flow-renderer'
 
-interface TransitionNodeProbs {
+interface PlaceNodeProbs {
     setSelectedNode: (value: Node) => void
 }
 
-const TransitionNode = memo(
+const PlaceNode = memo(
     ({
         id,
         xPos,
@@ -16,7 +16,7 @@ const TransitionNode = memo(
         id: string
         xPos: number
         yPos: number
-        data: TransitionNodeProbs
+        data: PlaceNodeProbs
     }) => {
         return (
             <>
@@ -24,7 +24,16 @@ const TransitionNode = memo(
                     type="target"
                     position={Position.Top}
                     style={{ background: '#555' }}
-                    onConnect={(params) => console.log('handle onConnect', params)}
+                    onConnect={(params) =>
+                        console.log(
+                            'handle onConnect',
+                            params,
+                            'source: ',
+                            params.sourceHandle,
+                            ' | target: ',
+                            params.targetHandle
+                        )
+                    }
                     isConnectable={true}
                 />
                 <Button
@@ -34,7 +43,8 @@ const TransitionNode = memo(
                         m: 1,
                         border: 1,
                         width: '5rem',
-                        height: '10rem',
+                        height: '5rem',
+                        borderRadius: '50%',
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -47,7 +57,7 @@ const TransitionNode = memo(
                         })
                     }
                 >
-                    Transition
+                    Place
                 </Button>
                 <Handle
                     type="source"
@@ -60,5 +70,5 @@ const TransitionNode = memo(
         )
     }
 )
-TransitionNode.displayName = 'transitionNode'
-export default TransitionNode
+PlaceNode.displayName = 'PlaceNode'
+export default PlaceNode
