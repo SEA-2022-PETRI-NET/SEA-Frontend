@@ -1,5 +1,5 @@
 import IconButton from '@mui/material/IconButton'
-import { Dialog, DialogTitle, List, ListItem, ListItemAvatar, Avatar, Tooltip } from '@mui/material'
+import { Dialog, DialogTitle } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { InboxOutlined } from '@ant-design/icons'
 import type { UploadProps } from 'antd'
@@ -43,20 +43,18 @@ export default function UploadPetriNetDialog(props: UploadDialogProps) {
         <Dialog PaperProps={{ sx: { width: '50%' } }} onClose={handleClose} open={open}>
             <DialogTitle>
                 Upload file
-                {onClose ? (
-                    <IconButton
-                        aria-label="close"
-                        onClick={onClose}
-                        sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: 8,
-                            color: (theme) => theme.palette.grey[500],
-                        }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                ) : null}
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
             </DialogTitle>
             <div style={{ margin: '30px 80px 50px 80px' }}>
                 <Dragger {...props}>

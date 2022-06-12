@@ -17,7 +17,7 @@ import { toast } from 'react-toastify'
 import { PetriNet, Place, Transition, Arc } from '../../models/PetrinetModels'
 import { Node, Edge } from 'react-flow-renderer'
 import UploadPetriNetDialog from './modals/UploadPetriNetDialog'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { EdgeDataProbs, NodeDataProbs } from './PetriNetModelling'
 import PlaceNode from './PlaceNode'
 import TransitionNode from './TransitionNode'
@@ -57,18 +57,19 @@ export default function ActionButtons({
                     name: node.data.name,
                     numberOfTokens: node.data.numberOfTokens,
                     tokens: node.data.tokens,
+                    position: node.position,
                 } as Place)
             }
             if (node.type === TransitionNode.displayName) {
                 transitions.push({
                     transitionId: Number(node.id),
                     name: node.data.name,
+                    position: node.position,
                 } as Transition)
             }
         })
         edges.forEach((edge: Edge<EdgeDataProbs>) => {
             arcs.push({
-                id: Number(edge.id),
                 sourceNode: Number(edge.source),
                 targetNode: Number(edge.target),
             } as Arc)
@@ -203,7 +204,10 @@ export default function ActionButtons({
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Simulate">
-                    <IconButton sx={{ margin: '0px 5px 0px 0px' }}>
+                    <IconButton
+                        onClick={() => navigate(`/modelling/${petriNetId}/simulate`)}
+                        sx={{ margin: '0px 5px 0px 0px' }}
+                    >
                         <PlayArrowTwoToneIcon sx={{ color: 'green' }} />
                     </IconButton>
                 </Tooltip>

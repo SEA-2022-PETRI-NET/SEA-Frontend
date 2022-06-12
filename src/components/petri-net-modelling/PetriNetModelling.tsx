@@ -65,12 +65,12 @@ export default function PetriNetModelling() {
     const fetchPetriNet = async () => {
         const response = await getPetriNetById(Number(petriNetId))
         if (response.successful) {
-            const nodes = response.data.places.map((p) => {
+            const fetchedNodes = response.data.places.map((p) => {
                 const position = p.position
                     ? p.position
                     : { x: Math.random() * 300, y: Math.random() * 300 }
                 return {
-                    id: p.id.toString(),
+                    id: p.placeId.toString(),
                     type: PlaceNode.displayName,
                     position: position,
                     data: {
@@ -79,13 +79,13 @@ export default function PetriNetModelling() {
                     },
                 } as Node
             })
-            nodes.push(
+            fetchedNodes.push(
                 ...response.data.transitions.map((t) => {
                     const position = t.position
                         ? t.position
                         : { x: Math.random() * 300, y: Math.random() * 300 }
                     return {
-                        id: t.id.toString(),
+                        id: t.transitionId.toString(),
                         type: TransitionNode.displayName,
                         position: position,
                         data: {
@@ -95,25 +95,24 @@ export default function PetriNetModelling() {
                     } as Node<NodeDataProbs>
                 })
             )
-            setNodes(nodes)
-            const newEdges = response.data.arcs.map((a) => {
+            setNodes(fetchedNodes)
+            const fetchedEdges = response.data.arcs.map((a) => {
                 return {
-                    id: `${Math.random() * 100}`,
                     source: a.sourceNode.toString(),
                     target: a.targetNode.toString(),
                     animated: true,
                 } as Edge<EdgeDataProbs>
             })
-            setEdges(newEdges)
+            setEdges(fetchedEdges)
 
             setPetriNetName(response.data.name)
             response.data.places.forEach((n) =>
-                nodeIdsToTypes.set(`${n.id}`, PlaceNode.displayName ?? 'default')
+                nodeIdsToTypes.set(`${n.placeId}`, PlaceNode.displayName ?? 'default')
             )
             response.data.transitions.forEach((n) =>
-                nodeIdsToTypes.set(`${n.id}`, PlaceNode.displayName ?? 'default')
+                nodeIdsToTypes.set(`${n.transitionId}`, PlaceNode.displayName ?? 'default')
             )
-            nextNodeId = Math.max(...nodes.map((n) => Number(n.id))) + 1
+            nextNodeId = Math.max(...fetchedNodes.map((n) => Number(n.id))) + 1
             toast.success('Retrieved petri net')
         } else {
             toast.error('Could not retrieve petri net')
@@ -155,8 +154,8 @@ export default function PetriNetModelling() {
 
     const onRemoveNode = (id: string) => {
         nodeIdsToTypes.delete(id)
-        setNodes(nodes.filter((node) => node.id !== id))
-        setEdges(edges.filter((edge) => edge.source !== id && edge.target !== id))
+        setNodes((nds) => nds.filter((node) => node.id !== id))
+        setEdges((edgs) => edgs.filter((edge) => edge.source !== id && edge.target !== id))
     }
 
     const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
@@ -168,7 +167,6 @@ export default function PetriNetModelling() {
         (event: React.DragEvent<HTMLDivElement>) => {
             if (reactFlowWrapper && reactFlowWrapper.current && reactFlowInstance) {
                 event.preventDefault()
-
                 const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect()
 
                 const type = event.dataTransfer.getData('application/reactflow')
