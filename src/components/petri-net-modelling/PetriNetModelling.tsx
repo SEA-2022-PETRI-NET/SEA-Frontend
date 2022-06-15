@@ -55,10 +55,7 @@ export default function PetriNetModelling() {
     const [edges, setEdges] = useState(initialEdges)
 
     const [selectedNode, setSelectedNode] = useState<Node | null>(null)
-    const [connectedAfterConnectStart, setConnectedAfterConnectStart] = useState(false)
-
-    const isValidConnection = (connection: Connection) =>
-        typeof connection.source !== typeof connection.target
+    const [connectionSource, setConnectionSource] = useState<string | null>(null)
 
     const onConnect = useCallback(
         (params: Connection | Edge) =>
@@ -67,11 +64,6 @@ export default function PetriNetModelling() {
                     ...params,
                     animated: true,
                 }
-                setConnectedAfterConnectStart(true)
-                console.log(
-                    'onConnect set connectedAfterConnectStart to ',
-                    connectedAfterConnectStart
-                )
                 if (idToType.get(edge.source) !== idToType.get(edge.target)) {
                     return addEdge(edge, eds)
                 } else {
@@ -168,17 +160,12 @@ export default function PetriNetModelling() {
                             event: React.MouseEvent,
                             { nodeId, handleType }: OnConnectStartParams
                         ) => {
-                            console.log('connect start', event),
-                                setConnectedAfterConnectStart(false)
+                            setConnectionSource(nodeId)
+                            console.log('connect start from', nodeId, event)
                         }}
                         onConnectStop={(event: MouseEvent) => console.log('connect stop', event)}
                         onConnectEnd={async (event: MouseEvent) => {
-                            console.log(
-                                'connect end (after onConnect: ',
-                                connectedAfterConnectStart,
-                                ')',
-                                event
-                            )
+                            console.log('connect end (from', connectionSource, ')', event)
 
                             if (reactFlowWrapper && reactFlowWrapper.current && reactFlowInstance) {
                                 event.preventDefault()
