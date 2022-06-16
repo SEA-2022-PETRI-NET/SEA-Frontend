@@ -3,14 +3,14 @@ import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Box } fro
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { Node } from 'react-flow-renderer'
-import { NodeDataProbs } from '../PetriNetModelling'
-import { useState } from 'react'
+import { NodeDataProps } from '../PetriNetModelling'
+import PlaceNode from '../PlaceNode'
 
 export interface ChangeNodeDialogProps {
-    selectedNode: Node<NodeDataProbs> | null
+    selectedNode: Node<NodeDataProps> | null
     onClose: () => void
     onDelete: () => void
-    changeSelectedNode: (id: string | undefined, data: NodeDataProbs) => void
+    changeSelectedNode: (id: string | undefined, data: NodeDataProps) => void
 }
 
 export default function ChangeNodeDialog({
@@ -46,15 +46,24 @@ export default function ChangeNodeDialog({
                             changeSelectedNode(selectedNode?.id, {
                                 ...selectedNode?.data,
                                 name: e.target.value,
-                            } as NodeDataProbs)
+                            } as NodeDataProps)
                         }
                     />
-                    <TextField
-                        label="Tokens"
-                        type="number"
-                        variant="outlined"
-                        style={{ margin: '10px auto' }}
-                    />
+                    {selectedNode?.type === PlaceNode.displayName && (
+                        <TextField
+                            label="Tokens"
+                            type="number"
+                            variant="outlined"
+                            style={{ margin: '10px auto' }}
+                            value={selectedNode?.data.numberOfTokens}
+                            onChange={(e) =>
+                                changeSelectedNode(selectedNode?.id, {
+                                    ...selectedNode?.data,
+                                    numberOfTokens: Number(e.target.value),
+                                } as NodeDataProps)
+                            }
+                        />
+                    )}
                 </Box>
             </DialogContent>
             <DialogActions>

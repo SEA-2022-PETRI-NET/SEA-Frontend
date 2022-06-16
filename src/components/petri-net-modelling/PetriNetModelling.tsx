@@ -12,8 +12,6 @@ import ReactFlow, {
     OnConnectStartParams,
     NodeChange,
     applyNodeChanges,
-    EdgeChange,
-    applyEdgeChanges,
 } from 'react-flow-renderer'
 import Grid4x4Icon from '@mui/icons-material/Grid4x4'
 import SideBar from './Sidebar'
@@ -33,14 +31,14 @@ let nextNodeId = 1
 const getNextNodeId = () => `${nextNodeId++}`
 const nodeIdsToTypes = new Map<string, string>()
 
-export interface NodeDataProbs {
+export interface NodeDataProps {
     name: string
-    setSelectedNode: (value: Node) => void
+    setSelectedNode: (value: Node<NodeDataProps>) => void
     numberOfTokens?: number
     tokens?: Token[]
 }
 
-export interface EdgeDataProbs {
+export interface EdgeDataProps {
     name: string
 }
 
@@ -55,8 +53,8 @@ export default function PetriNetModelling() {
     const [selectedNode, setSelectedNode] = useState<Node | null>(null)
 
     // Petri Net state
-    const [nodes, setNodes] = useState<Node<NodeDataProbs>[]>([])
-    const [edges, setEdges] = useState<Edge<EdgeDataProbs>[]>([])
+    const [nodes, setNodes] = useState<Node<NodeDataProps>[]>([])
+    const [edges, setEdges] = useState<Edge<EdgeDataProps>[]>([])
     const [petriNetName, setPetriNetName] = useState<string>('untitled')
     const { petriNetId } = useParams()
 
@@ -96,7 +94,7 @@ export default function PetriNetModelling() {
                             name: t.name,
                             setSelectedNode: setSelectedNode,
                         },
-                    } as Node<NodeDataProbs>
+                    } as Node<NodeDataProps>
                 })
             )
             setNodes(fetchedNodes)
@@ -105,7 +103,7 @@ export default function PetriNetModelling() {
                     source: a.sourceNode.toString(),
                     target: a.targetNode.toString(),
                     animated: true,
-                } as Edge<EdgeDataProbs>
+                } as Edge<EdgeDataProps>
             })
             setEdges(fetchedEdges)
 
@@ -128,7 +126,7 @@ export default function PetriNetModelling() {
         [setNodes]
     )
 
-    function onChangeSelectedNode(id: string | undefined, data: NodeDataProbs) {
+    function onChangeSelectedNode(id: string | undefined, data: NodeDataProps) {
         setSelectedNode((n) => {
             return { ...n, data: data } as Node
         })
@@ -219,7 +217,7 @@ export default function PetriNetModelling() {
                     newEdge.id = 'e' + newNodeId + '-' + connectionSource
                     newEdge.source = newNodeId
                     newEdge.target = connectionSource
-                    if (newNode.type === nodeTypes.placeNode.displayName) {
+                    if (newNode.type === PlaceNode.displayName) {
                         newNode.position.y -= 96
                     } else {
                         newNode.position.y -= 176
@@ -286,7 +284,7 @@ export default function PetriNetModelling() {
                     y: event.clientY - reactFlowBounds.top,
                 })
                 const nodeId = getNextNodeId()
-                const newNode: Node<NodeDataProbs> = {
+                const newNode: Node<NodeDataProps> = {
                     id: nodeId,
                     type,
                     position,

@@ -18,18 +18,18 @@ import { PetriNet, Place, Transition, Arc } from '../../models/PetrinetModels'
 import { Node, Edge } from 'react-flow-renderer'
 import UploadPetriNetDialog from './modals/UploadPetriNetDialog'
 import { useNavigate } from 'react-router-dom'
-import { EdgeDataProbs, NodeDataProbs } from './PetriNetModelling'
+import { EdgeDataProps, NodeDataProps } from './PetriNetModelling'
 import PlaceNode from './PlaceNode'
 import TransitionNode from './TransitionNode'
 
 interface ActionButtons {
     style?: React.CSSProperties | undefined
-    nodes: Node<NodeDataProbs>[]
-    edges: Edge<EdgeDataProbs>[]
+    nodes: Node<NodeDataProps>[]
+    edges: Edge<EdgeDataProps>[]
     petriNetId: string
     petriNetName: string
-    setNodes: (nodes: Node<NodeDataProbs>[]) => void
-    setEdges: (edges: Edge<EdgeDataProbs>[]) => void
+    setNodes: (nodes: Node<NodeDataProps>[]) => void
+    setEdges: (edges: Edge<EdgeDataProps>[]) => void
     setSelectedNode: (value: Node) => void
 }
 
@@ -50,7 +50,7 @@ export default function ActionButtons({
         const arcs: Arc[] = []
         const places: Place[] = []
         const transitions: Transition[] = []
-        nodes.forEach(function (node: Node<NodeDataProbs>) {
+        nodes.forEach(function (node: Node<NodeDataProps>) {
             if (node.type === PlaceNode.displayName) {
                 places.push({
                     placeId: Number(node.id),
@@ -68,7 +68,7 @@ export default function ActionButtons({
                 } as Transition)
             }
         })
-        edges.forEach((edge: Edge<EdgeDataProbs>) => {
+        edges.forEach((edge: Edge<EdgeDataProps>) => {
             arcs.push({
                 sourceNode: Number(edge.source),
                 targetNode: Number(edge.target),
