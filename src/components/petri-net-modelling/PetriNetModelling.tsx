@@ -114,7 +114,7 @@ export default function PetriNetModelling() {
                 nodeIdsToTypes.set(`${n.placeId}`, PlaceNode.displayName ?? 'default')
             )
             response.data.transitions.forEach((n) =>
-                nodeIdsToTypes.set(`${n.transitionId}`, PlaceNode.displayName ?? 'default')
+                nodeIdsToTypes.set(`${n.transitionId}`, TransitionNode.displayName ?? 'default')
             )
             nextNodeId = Math.max(...fetchedNodes.map((n) => Number(n.id))) + 1
             toast.success('Retrieved petri net')
@@ -146,15 +146,7 @@ export default function PetriNetModelling() {
         )
     }
 
-    /* const onEdgesChange = useCallback(
-        (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-        [setEdges]
-    ) */
-
-    const onConnectStart = (
-        event: React.MouseEvent,
-        { nodeId, handleType }: OnConnectStartParams
-    ) => {
+    const onConnectStart = (event: React.MouseEvent, { nodeId }: OnConnectStartParams) => {
         if (nodeId && reactFlowWrapper && reactFlowWrapper.current && reactFlowInstance) {
             event.preventDefault()
             const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect()
@@ -203,9 +195,10 @@ export default function PetriNetModelling() {
                     y: mousePosition.y,
                 }
                 const newNodeId = getNextNodeId()
-                let newNodeType = nodeTypes.placeNode.displayName
-                if (nodeIdsToTypes.get(connectionSource) === nodeTypes.placeNode.displayName) {
-                    newNodeType = nodeTypes.transitionNode.displayName
+                let newNodeType = PlaceNode.displayName
+                console.log(nodeIdsToTypes.get(connectionSource))
+                if (nodeIdsToTypes.get(connectionSource) === PlaceNode.displayName) {
+                    newNodeType = TransitionNode.displayName
                 }
                 const newNode: Node = {
                     id: newNodeId,
