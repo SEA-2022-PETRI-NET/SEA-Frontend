@@ -3,6 +3,7 @@ import { memo } from 'react'
 import { Node, Handle, Position } from 'react-flow-renderer'
 
 interface TransitionNodeProbs {
+    name: string
     setSelectedNode: (value: Node) => void
 }
 
@@ -46,7 +47,7 @@ const TransitionNode = memo(
                         })
                     }
                 >
-                    Transition
+                    {data.name}
                 </Button>
                 <Handle
                     type="source"

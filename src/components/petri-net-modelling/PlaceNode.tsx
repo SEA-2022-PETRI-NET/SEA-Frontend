@@ -3,6 +3,8 @@ import { memo } from 'react'
 import { Node, Handle, Position } from 'react-flow-renderer'
 
 interface PlaceNodeProbs {
+    name: string
+    tokens: number
     setSelectedNode: (value: Node) => void
 }
 
@@ -47,7 +49,7 @@ const PlaceNode = memo(
                         })
                     }
                 >
-                    Place
+                    {data.name}
                 </Button>
                 <Handle
                     type="source"
