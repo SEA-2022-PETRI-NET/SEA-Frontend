@@ -23,7 +23,7 @@ const TransitionNode = memo(
                 <Handle
                     type="target"
                     position={Position.Top}
-                    style={{ background: '#555' }}
+                    style={{ background: '#555', width: '10px', height: '10px' }}
                     isConnectable={true}
                 />
                 <Button
@@ -51,7 +51,7 @@ const TransitionNode = memo(
                 <Handle
                     type="source"
                     position={Position.Bottom}
-                    style={{ background: '#555' }}
+                    style={{ background: '#555', width: '10px', height: '10px' }}
                     isConnectable={true}
                 />
             </>

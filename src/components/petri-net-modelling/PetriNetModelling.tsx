@@ -9,10 +9,9 @@ import ReactFlow, {
     ReactFlowInstance,
     Edge,
     Connection,
+    OnConnectStartParams,
     NodeChange,
     applyNodeChanges,
-    applyEdgeChanges,
-    EdgeChange,
 } from 'react-flow-renderer'
 import Grid4x4Icon from '@mui/icons-material/Grid4x4'
 import SideBar from './Sidebar'
@@ -42,6 +41,9 @@ export interface NodeDataProbs {
 export interface EdgeDataProbs {
     name: string
 }
+
+let connectionSource = ''
+let connectionFromTop = true
 
 export default function PetriNetModelling() {
     const reactFlowWrapper = useRef<HTMLDivElement>(null)
@@ -124,10 +126,96 @@ export default function PetriNetModelling() {
         [setNodes]
     )
 
-    const onEdgesChange = useCallback(
-        (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-        [setEdges]
-    )
+    const onConnectStart = (
+        event: React.MouseEvent,
+        { nodeId, handleType }: OnConnectStartParams
+    ) => {
+        if (nodeId && reactFlowWrapper && reactFlowWrapper.current && reactFlowInstance) {
+            event.preventDefault()
+            const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect()
+            const sourceNode = nodes.find((node) => node.id === nodeId)
+            connectionSource = nodeId
+            const mousePosition = reactFlowInstance.project({
+                x: event.clientX - reactFlowBounds?.left,
+                y: event.clientY - reactFlowBounds.top,
+            })
+            if (sourceNode && mousePosition.y - 10 <= sourceNode?.position.y) {
+                connectionFromTop = true
+            } else {
+                connectionFromTop = false
+            }
+        }
+    }
+
+    const onConnectEnd = (event: MouseEvent) => {
+        if (reactFlowWrapper && reactFlowWrapper.current && reactFlowInstance) {
+            event.preventDefault()
+            const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect()
+            const mousePosition = reactFlowInstance.project({
+                x: event.clientX - reactFlowBounds?.left,
+                y: event.clientY - reactFlowBounds.top,
+            })
+
+            let foundCloseNode = false
+
+            for (const node of nodes) {
+                if (!node.width || !node.height) {
+                    break
+                }
+                if (
+                    node.position.x < mousePosition.x &&
+                    mousePosition.x < node.position.x + node.width &&
+                    node.position.y - 10 < mousePosition.y &&
+                    mousePosition.y < node.position.y + node.height + 10
+                ) {
+                    foundCloseNode = true
+                    break
+                }
+            }
+            if (!foundCloseNode) {
+                const newNodePosition = {
+                    x: mousePosition.x - 48,
+                    y: mousePosition.y,
+                }
+                const newNodeId = getNextNodeId()
+                let newNodeType = nodeTypes.placeNode.displayName
+                if (nodeIdsToTypes.get(connectionSource) === nodeTypes.placeNode.displayName) {
+                    newNodeType = nodeTypes.transitionNode.displayName
+                }
+                const newNode: Node = {
+                    id: newNodeId,
+                    type: newNodeType,
+                    position: newNodePosition,
+                    data: {
+                        label: `${newNodeType} node`,
+                        setSelectedNode: setSelectedNode,
+                    },
+                }
+                const newEdge: Edge = {
+                    id: 'e' + connectionSource + '-' + newNodeId,
+                    source: connectionSource,
+                    target: newNodeId,
+                    animated: true,
+                }
+                if (connectionFromTop) {
+                    newEdge.id = 'e' + newNodeId + '-' + connectionSource
+                    newEdge.source = newNodeId
+                    newEdge.target = connectionSource
+                    if (newNode.type === nodeTypes.placeNode.displayName) {
+                        newNode.position.y -= 96
+                    } else {
+                        newNode.position.y -= 176
+                    }
+                }
+
+                if (newNodeType) {
+                    nodeIdsToTypes.set(newNodeId, newNodeType)
+                }
+                setNodes((nds) => nds.concat(newNode))
+                setEdges((eds) => eds.concat(newEdge))
+            }
+        }
+    }
 
     const onConnect = useCallback(
         (params: Connection | Edge) => {
@@ -232,8 +320,9 @@ export default function PetriNetModelling() {
                         nodes={nodes}
                         edges={edges}
                         onNodesChange={onNodesChange}
-                        onEdgesChange={onEdgesChange}
                         onConnect={onConnect}
+                        onConnectStart={onConnectStart}
+                        onConnectEnd={onConnectEnd}
                         onInit={setReactFlowInstance}
                         onDrop={onDrop}
                         onDragOver={onDragOver}
