@@ -22,9 +22,29 @@ export const getPetriNets = (): Promise<Response<PetriNet[]>> =>
         method: 'GET',
     })
 
-export const savePetriNet = (petriNet: PetriNet): Promise<Response<number>> =>
+export const savePetriNet = (petriNet: PetriNet): Promise<Response<PetriNet>> =>
     backendConnection.request({
         url: '/Model',
         method: 'POST',
         data: petriNet,
+    })
+
+export const updatePetriNet = (id: string, petriNet: PetriNet): Promise<Response<PetriNet>> =>
+    backendConnection.request({
+        url: `/Model/${id}`,
+        method: 'PUT',
+        data: petriNet,
+    })
+
+export const validatePetriNet = (petriNet: PetriNet): Promise<Response<void>> =>
+    backendConnection.request({
+        url: '/Model/validate-petri-net',
+        method: 'POST',
+        data: petriNet,
+    })
+
+export const deletePetriNet = (petriNetId: number): Promise<Response<void>> =>
+    backendConnection.request({
+        url: `/Model/${petriNetId}`,
+        method: 'DELETE',
     })

@@ -9,11 +9,8 @@ import ListItem from '@mui/material/ListItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined'
 import CropPortraitSharpIcon from '@mui/icons-material/CropPortraitSharp'
-import TransitionNode from './TransitionNode'
-import PlaceNode from './PlaceNode'
 
 const drawerWidth = 180
-const defaultNodeType = 'defualt'
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: drawerWidth,
@@ -92,9 +89,7 @@ export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBar
                     <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
                         <div
                             className="dndnode input"
-                            onDragStart={(event) =>
-                                onDragStart(event, PlaceNode.displayName ?? defaultNodeType)
-                            }
+                            onDragStart={(event) => onDragStart(event, 'place')}
                             draggable
                             style={{ display: 'flex', flexDirection: 'row' }}
                         >
@@ -113,9 +108,7 @@ export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBar
                     <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
                         <div
                             className="dndnode input"
-                            onDragStart={(event) =>
-                                onDragStart(event, TransitionNode.displayName ?? defaultNodeType)
-                            }
+                            onDragStart={(event) => onDragStart(event, 'transition')}
                             draggable
                             style={{ display: 'flex', flexDirection: 'row' }}
                         >

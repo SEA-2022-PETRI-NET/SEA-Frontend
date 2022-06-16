@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import { memo } from 'react'
-import { Node, Handle, Position, Connection } from 'react-flow-renderer'
+import { Node, Handle, Position } from 'react-flow-renderer'
 
 interface PlaceNodeProbs {
     setSelectedNode: (value: Node) => void
@@ -59,5 +59,5 @@ const PlaceNode = memo(
         )
     }
 )
-PlaceNode.displayName = 'PlaceNode'
+PlaceNode.displayName = 'placeNode'
 export default PlaceNode
