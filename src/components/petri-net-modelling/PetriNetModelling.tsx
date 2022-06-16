@@ -124,6 +124,24 @@ export default function PetriNetModelling() {
         [setNodes]
     )
 
+    function onChangeSelectedNode(id: string | undefined, data: NodeDataProbs) {
+        setSelectedNode((n) => {
+            return { ...n, data: data } as Node
+        })
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id !== id) {
+                    return node
+                }
+
+                return {
+                    ...node,
+                    data: data,
+                }
+            })
+        )
+    }
+
     const onEdgesChange = useCallback(
         (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
         [setEdges]
@@ -262,6 +280,7 @@ export default function PetriNetModelling() {
                     if (selectedNode) onRemoveNode(selectedNode.id)
                     setSelectedNode(null)
                 }}
+                changeSelectedNode={onChangeSelectedNode}
             />
         </>
     )

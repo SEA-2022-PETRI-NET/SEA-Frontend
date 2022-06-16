@@ -1,10 +1,12 @@
 import { Button } from '@mui/material'
 import { memo } from 'react'
 import { Node, Handle, Position } from 'react-flow-renderer'
+import { Token } from '../../models/PetrinetModels'
 
 interface PlaceNodeProbs {
     name: string
-    tokens: number
+    numberOfTokens?: number
+    tokens?: Token[]
     setSelectedNode: (value: Node) => void
 }
 
@@ -50,6 +52,7 @@ const PlaceNode = memo(
                     }
                 >
                     {data.name}
+                    {data.numberOfTokens}
                 </Button>
                 <Handle
                     type="source"
