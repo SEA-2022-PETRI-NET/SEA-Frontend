@@ -24,16 +24,6 @@ const PlaceNode = memo(
                     type="target"
                     position={Position.Top}
                     style={{ background: '#555', width: '10px', height: '10px' }}
-                    onConnect={(params) =>
-                        console.log(
-                            'handle onConnect',
-                            params,
-                            'source: ',
-                            params.sourceHandle,
-                            ' | target: ',
-                            params.targetHandle
-                        )
-                    }
                     isConnectable={true}
                 />
                 <Button
@@ -63,7 +53,6 @@ const PlaceNode = memo(
                     type="source"
                     position={Position.Bottom}
                     style={{ background: '#555', width: '10px', height: '10px' }}
-                    onConnect={(params) => console.log('handle onConnect', params)}
                     isConnectable={true}
                 />
             </>

@@ -24,7 +24,6 @@ const TransitionNode = memo(
                     type="target"
                     position={Position.Top}
                     style={{ background: '#555', width: '10px', height: '10px' }}
-                    onConnect={(params) => console.log('handle onConnect', params)}
                     isConnectable={true}
                 />
                 <Button
@@ -53,7 +52,6 @@ const TransitionNode = memo(
                     type="source"
                     position={Position.Bottom}
                     style={{ background: '#555', width: '10px', height: '10px' }}
-                    onConnect={(params) => console.log('handle onConnect', params)}
                     isConnectable={true}
                 />
             </>
