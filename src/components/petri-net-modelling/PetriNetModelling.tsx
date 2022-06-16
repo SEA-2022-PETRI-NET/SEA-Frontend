@@ -297,9 +297,12 @@ export default function PetriNetModelling() {
                                         y: mousePosition.y,
                                     }
                                     const newNodeId = getNextNodeId()
-                                    let newNodeType = 'place'
-                                    if (nodeIdsToTypes.get(connectionSource) === 'place') {
-                                        newNodeType = 'transition'
+                                    let newNodeType = nodeTypes.placeNode.displayName
+                                    if (
+                                        nodeIdsToTypes.get(connectionSource) ===
+                                        nodeTypes.placeNode.displayName
+                                    ) {
+                                        newNodeType = nodeTypes.transitionNode.displayName
                                     }
                                     const newNode: Node = {
                                         id: newNodeId,
@@ -320,14 +323,16 @@ export default function PetriNetModelling() {
                                         newEdge.id = 'e' + newNodeId + '-' + connectionSource
                                         newEdge.source = newNodeId
                                         newEdge.target = connectionSource
-                                        if (newNode.type === 'place') {
+                                        if (newNode.type === nodeTypes.placeNode.displayName) {
                                             newNode.position.y -= 96
                                         } else {
                                             newNode.position.y -= 176
                                         }
                                     }
 
-                                    nodeIdsToTypes.set(newNodeId, newNodeType)
+                                    if (newNodeType) {
+                                        nodeIdsToTypes.set(newNodeId, newNodeType)
+                                    }
                                     setNodes((nds) => nds.concat(newNode))
                                     setEdges((eds) => eds.concat(newEdge))
                                 }
