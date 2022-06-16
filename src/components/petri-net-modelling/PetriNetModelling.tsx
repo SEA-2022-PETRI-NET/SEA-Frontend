@@ -45,7 +45,7 @@ export interface NodeDataProbs {
 export interface EdgeDataProbs {
     name: string
 }
-  
+
 let connectionSource = ''
 let connectionFromTop = true
 
@@ -327,7 +327,7 @@ export default function PetriNetModelling() {
                                         }
                                     }
 
-                                    idToType.set(newNodeId, newNodeType)
+                                    nodeIdsToTypes.set(newNodeId, newNodeType)
                                     setNodes((nds) => nds.concat(newNode))
                                     setEdges((eds) => eds.concat(newEdge))
                                 }
