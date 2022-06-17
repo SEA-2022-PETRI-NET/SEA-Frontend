@@ -1,9 +1,13 @@
 import { Button } from '@mui/material'
 import { memo } from 'react'
 import { Node, Handle, Position, NodeProps, XYPosition } from 'react-flow-renderer'
+import { useAppSelector } from '../../store/hooks'
+import { isSimulationRunning } from '../../store/petriNetSlice'
 import { NodeDataProps } from './PetriNetModelling'
 
 const TransitionNode = memo((node: NodeProps<NodeDataProps>) => {
+    const isSimRunning = useAppSelector(isSimulationRunning)
+
     return (
         <>
             <Handle
@@ -14,7 +18,7 @@ const TransitionNode = memo((node: NodeProps<NodeDataProps>) => {
             />
             <Button
                 sx={{
-                    bgcolor: 'background.paper',
+                    bgcolor: isSimRunning && node.data.isEnabled ? 'green' : 'background.paper',
                     borderColor: 'text.primary',
                     m: 1,
                     border: 1,
@@ -24,12 +28,18 @@ const TransitionNode = memo((node: NodeProps<NodeDataProps>) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
-                onClick={() =>
-                    node.data.setSelectedNode({
-                        ...node,
-                        position: { x: node.xPos, y: node.yPos } as XYPosition,
-                    } as Node<NodeDataProps>)
-                }
+                onClick={(e) => {
+                    e.preventDefault()
+                    if (isSimRunning && node.data.isEnabled && node.data.fireTransition) {
+                        node.data.fireTransition()
+                    }
+                    if (!isSimRunning && node.data.setSelectedNode) {
+                        node.data.setSelectedNode({
+                            ...node,
+                            position: { x: node.xPos, y: node.yPos } as XYPosition,
+                        } as Node<NodeDataProps>)
+                    }
+                }}
             >
                 {node.data.name}
             </Button>

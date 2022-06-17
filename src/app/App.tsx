@@ -10,7 +10,6 @@ import Transforming from '../components/Transforming'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Overview from '../components/Overview'
-import PetriNetSimulation from '../components/petri-net-simulation/PetriNetSimulation'
 import About from '../components/About'
 
 function App() {
@@ -53,10 +52,6 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Overview />} />
                     <Route path="/modelling/:petriNetId" element={<PetriNetModelling />} />
-                    <Route
-                        path="/modelling/:petriNetId/simulate"
-                        element={<PetriNetSimulation />}
-                    />
                     <Route path="/transformer" element={<Transforming />} />
                     <Route path="about" element={<About />} />
                 </Routes>

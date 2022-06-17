@@ -15,3 +15,12 @@ export const getEnabledTransitions = (id: number): Promise<Response<Transition[]
         url: `/Simulation/${id}`,
         method: 'GET',
     })
+
+export const fireTransitionRequest = (
+    petriNetId: number,
+    transitionId: number
+): Promise<Response<Transition[]>> =>
+    backendConnection.request({
+        url: `/Simulation/${petriNetId}/${transitionId}`,
+        method: 'PUT',
+    })

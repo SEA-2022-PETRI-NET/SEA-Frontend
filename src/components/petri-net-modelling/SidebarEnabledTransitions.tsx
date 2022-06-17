@@ -6,9 +6,8 @@ import IconButton from '@mui/material/IconButton'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ListItem from '@mui/material/ListItem'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined'
-import CropPortraitSharpIcon from '@mui/icons-material/CropPortraitSharp'
+import { Transition } from '../../models/PetrinetModels'
+import { Button } from '@mui/material'
 
 const drawerWidth = 180
 
@@ -52,17 +51,17 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     })
 )
 
-interface SideBarProps {
+interface SidebarProps {
     openDrawer: boolean
     setOpenDrawer: (value: boolean) => void
+    enabledTransitions: Transition[]
 }
 
-export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBarProps) {
-    const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
-        event.dataTransfer.setData('application/reactflow', nodeType)
-        event.dataTransfer.effectAllowed = 'move'
-    }
-
+export default function SidebarEnabledTransitions({
+    openDrawer,
+    setOpenDrawer,
+    enabledTransitions,
+}: SidebarProps) {
     return (
         <>
             <Drawer variant="permanent" open={openDrawer} style={{ zIndex: 5 }}>
@@ -86,44 +85,18 @@ export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBar
                 </div>
                 <Divider />
                 <List>
-                    <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
-                        <div
-                            className="dndnode input"
-                            onDragStart={(event) => onDragStart(event, 'place')}
-                            draggable
-                            style={{ display: 'flex', flexDirection: 'row' }}
+                    {enabledTransitions.map((transition) => (
+                        <ListItem
+                            key={transition.transitionId}
+                            disablePadding
+                            sx={{ display: 'block', marginTop: '10px' }}
                         >
-                            <ListItemIcon
-                                sx={{
-                                    justifyContent: 'center',
-                                    width: '64px',
-                                    height: '40px',
-                                }}
-                            >
-                                <CircleOutlinedIcon />
-                            </ListItemIcon>
-                            {openDrawer && 'Place'}
-                        </div>
-                    </ListItem>
-                    <ListItem disablePadding sx={{ display: 'block', marginTop: '10px' }}>
-                        <div
-                            className="dndnode input"
-                            onDragStart={(event) => onDragStart(event, 'transition')}
-                            draggable
-                            style={{ display: 'flex', flexDirection: 'row' }}
-                        >
-                            <ListItemIcon
-                                sx={{
-                                    justifyContent: 'center',
-                                    width: '64px',
-                                    height: '40px',
-                                }}
-                            >
-                                <CropPortraitSharpIcon />
-                            </ListItemIcon>
-                            {openDrawer && 'Transition'}
-                        </div>
-                    </ListItem>
+                            <Button style={{ textTransform: 'none' }}>
+                                Id: {transition.transitionId}{' '}
+                                {openDrawer && 'name: ' + transition.name}{' '}
+                            </Button>
+                        </ListItem>
+                    ))}
                 </List>
             </Drawer>
         </>

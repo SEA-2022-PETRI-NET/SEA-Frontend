@@ -12,9 +12,10 @@ import ReactFlow, {
     OnConnectStartParams,
     NodeChange,
     applyNodeChanges,
+    MarkerType,
 } from 'react-flow-renderer'
 import Grid4x4Icon from '@mui/icons-material/Grid4x4'
-import SideBar from './Sidebar'
+import Sidebar from './Sidebar'
 import ActionButtons from './ActionButtons'
 import PlaceNode from './PlaceNode'
 import TransitionNode from './TransitionNode'
@@ -23,7 +24,11 @@ import { useParams } from 'react-router-dom'
 import { getPetriNetById } from '../../api/petri-net-modelling'
 import { toast } from 'react-toastify'
 import ChangeNodeDialog from './modals/ChangeNodeDialog'
-import { Token } from '../../models/PetrinetModels'
+import { Token, Transition } from '../../models/PetrinetModels'
+import { fireTransitionRequest, getEnabledTransitions } from '../../api/petri-net-simulation'
+import SidebarEnabledTransitions from './SidebarEnabledTransitions'
+import { useAppSelector } from '../../store/hooks'
+import { isSimulationRunning } from '../../store/petriNetSlice'
 
 const nodeTypes = { placeNode: PlaceNode, transitionNode: TransitionNode }
 
@@ -34,8 +39,13 @@ const nodeIdsToTypes = new Map<string, string>()
 export interface NodeDataProps {
     name: string
     setSelectedNode: (value: Node<NodeDataProps>) => void
+    //For Places
     numberOfTokens?: number
     tokens?: Token[]
+    //For Transitions
+    isEnabled?: boolean
+    petriNetId: string
+    fireTransition?: () => void
 }
 
 export interface EdgeDataProps {
@@ -51,6 +61,9 @@ export default function PetriNetModelling() {
     const [openDrawer, setOpenDrawer] = useState(false)
     const [showBackground, setShowBackground] = useState(false)
     const [selectedNode, setSelectedNode] = useState<Node | null>(null)
+    const [enabledTransitions, setEnabledTransitions] = useState<Transition[]>([])
+    //const [simulationIsRunning, setSimulationIsRunning] = useState(false)
+    const isSimRunning = useAppSelector(isSimulationRunning)
 
     // Petri Net state
     const [nodes, setNodes] = useState<Node<NodeDataProps>[]>([])
@@ -58,8 +71,54 @@ export default function PetriNetModelling() {
     const [petriNetName, setPetriNetName] = useState<string>('untitled')
     const { petriNetId } = useParams()
 
+    // USED FOR SIMULATION
     useEffect(() => {
-        if (petriNetId !== 'new') {
+        if (isSimRunning) {
+            fetchEnabledTransitions()
+        }
+    }, [isSimRunning])
+
+    useEffect(() => {
+        if (isSimRunning) {
+            setNodes((nds) =>
+                nds.map((node) => {
+                    if (enabledTransitions.find((t) => t.transitionId.toString() === node.id)) {
+                        return {
+                            ...node,
+                            data: {
+                                ...node.data,
+                                isEnabled: true,
+                            },
+                        } as Node<NodeDataProps>
+                    }
+                    return {
+                        ...node,
+                        data: {
+                            ...node.data,
+                            isEnabled: false,
+                        },
+                    } as Node<NodeDataProps>
+                })
+            )
+        }
+    }, [enabledTransitions])
+
+    const fetchEnabledTransitions = async () => {
+        const response = await getEnabledTransitions(Number(petriNetId))
+        if (response.successful) {
+            setEnabledTransitions(response.data)
+        }
+    }
+    // USED FOR SIMULATION
+
+    function attemptToFireTransition(nodeId: number) {
+        fireTransitionRequest(Number(petriNetId), nodeId)
+        fetchPetriNet()
+        fetchEnabledTransitions()
+    }
+
+    useEffect(() => {
+        if (petriNetId && petriNetId !== 'new') {
             fetchPetriNet()
         }
     }, [petriNetId])
@@ -77,9 +136,12 @@ export default function PetriNetModelling() {
                     position: position,
                     data: {
                         name: p.name,
+                        numberOfTokens: p.numberOfTokens,
+                        tokens: p.tokens,
                         setSelectedNode: setSelectedNode,
+                        petriNetId: petriNetId,
                     },
-                } as Node
+                } as Node<NodeDataProps>
             })
             fetchedNodes.push(
                 ...response.data.transitions.map((t) => {
@@ -93,6 +155,8 @@ export default function PetriNetModelling() {
                         data: {
                             name: t.name,
                             setSelectedNode: setSelectedNode,
+                            isEnabled: false,
+                            fireTransition: () => attemptToFireTransition(t.transitionId),
                         },
                     } as Node<NodeDataProps>
                 })
@@ -102,6 +166,7 @@ export default function PetriNetModelling() {
                 return {
                     source: a.sourceNode.toString(),
                     target: a.targetNode.toString(),
+                    markerEnd: { type: MarkerType.ArrowClosed },
                     animated: true,
                 } as Edge<EdgeDataProps>
             })
@@ -115,7 +180,6 @@ export default function PetriNetModelling() {
                 nodeIdsToTypes.set(`${n.transitionId}`, TransitionNode.displayName ?? 'default')
             )
             nextNodeId = Math.max(...fetchedNodes.map((n) => Number(n.id))) + 1
-            toast.success('Retrieved petri net')
         } else {
             toast.error('Could not retrieve petri net')
         }
@@ -194,7 +258,6 @@ export default function PetriNetModelling() {
                 }
                 const newNodeId = getNextNodeId()
                 let newNodeType = PlaceNode.displayName
-                console.log(nodeIdsToTypes.get(connectionSource))
                 if (nodeIdsToTypes.get(connectionSource) === PlaceNode.displayName) {
                     newNodeType = TransitionNode.displayName
                 }
@@ -207,10 +270,11 @@ export default function PetriNetModelling() {
                         setSelectedNode: setSelectedNode,
                     },
                 }
-                const newEdge: Edge = {
+                const newEdge: Edge<EdgeDataProps> = {
                     id: 'e' + connectionSource + '-' + newNodeId,
                     source: connectionSource,
                     target: newNodeId,
+                    markerEnd: { type: MarkerType.ArrowClosed },
                     animated: true,
                 }
                 if (connectionFromTop) {
@@ -238,6 +302,7 @@ export default function PetriNetModelling() {
             setEdges((eds) => {
                 const edge: Connection | Edge = {
                     ...params,
+                    markerEnd: { type: MarkerType.ArrowClosed },
                     animated: true,
                 }
                 if (edge.source === null) {
@@ -288,7 +353,11 @@ export default function PetriNetModelling() {
                     id: nodeId,
                     type,
                     position,
-                    data: { name: `${type} node ${nodeId}`, setSelectedNode: setSelectedNode },
+                    data: {
+                        name: `${type} node ${nodeId}`,
+                        setSelectedNode: setSelectedNode,
+                        petriNetId: petriNetId ?? '',
+                    },
                 }
                 nodeIdsToTypes.set(nodeId, type)
                 setNodes((nds) => nds.concat(newNode))
@@ -299,7 +368,15 @@ export default function PetriNetModelling() {
 
     return (
         <>
-            <SideBar openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
+            {isSimRunning ? (
+                <SidebarEnabledTransitions
+                    openDrawer={openDrawer}
+                    setOpenDrawer={setOpenDrawer}
+                    enabledTransitions={enabledTransitions}
+                />
+            ) : (
+                <Sidebar openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
+            )}
             <TextField
                 label="Petri Net name"
                 variant="outlined"
@@ -333,6 +410,7 @@ export default function PetriNetModelling() {
             <ReactFlowProvider>
                 <div className="reactflow-wrapper" ref={reactFlowWrapper}>
                     <ReactFlow
+                        nodesDraggable={!isSimRunning}
                         nodes={nodes}
                         edges={edges}
                         onNodesChange={onNodesChange}

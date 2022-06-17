@@ -55,12 +55,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     })
 )
 
-interface SideBarProps {
+interface SidebarProps {
     openDrawer: boolean
     setOpenDrawer: (value: boolean) => void
 }
 
-export default function PetriNetModelling({ openDrawer, setOpenDrawer }: SideBarProps) {
+export default function Sidebar({ openDrawer, setOpenDrawer }: SidebarProps) {
     const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
         event.dataTransfer.setData('application/reactflow', nodeType)
         event.dataTransfer.effectAllowed = 'move'

@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid'
 import { LoremIpsum } from 'react-lorem-ipsum'
 import Button from '@mui/material/Button'
 import { NavLink } from 'react-router-dom'
-import { List, ListItem, ListSubheader } from '@mui/material'
+import { Link, List, ListItem, ListSubheader } from '@mui/material'
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -25,7 +25,7 @@ export default function About() {
                 marginRight: '200px',
             }}
         >
-            <Grid container spacing={2}>
+            <Grid container spacing={8}>
                 <Grid item xs={5}>
                     <div
                         style={{
@@ -44,9 +44,35 @@ export default function About() {
                         />
                     </div>
                 </Grid>
-                <Grid item xs={7} sx={{ backgroundColor: '#e4e5e2' }}>
-                    <h1> About This</h1>
-                    This is a PetriNet modeling, simulation and transformation tool. It contains:
+                <Grid item xs={7}>
+                    <div style={{ backgroundColor: '#e4e5e2', padding: '40px 30px' }}>
+                        <h1> About This Tool</h1>
+                        <p>
+                            This is a Petri Net modeling, simulation and transformation tool. This
+                            tool supports transformations from{' '}
+                            <Link href="https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation">
+                                BPMN graphs
+                            </Link>{' '}
+                            to{' '}
+                            <Link href="https://en.wikipedia.org/wiki/Petri_net">
+                                Petri Net graphs
+                            </Link>
+                            .
+                        </p>
+                        <p>
+                            In the future it should also support transformations from Petri Net
+                            graphs into BPMN graphs and transformations between{' '}
+                            <Link href="https://dcrsolutions.net/">DCR graphs</Link> and Petri Net
+                            graphs.
+                        </p>
+                        <p>
+                            This tool was created as part of the Software Engineering and
+                            Architecture course at the University of Copenhagen in spring 2022.
+                        </p>
+                    </div>
+                </Grid>
+                <Grid item xs={12}>
+                    This tool contains:
                     <List sx={{ listStyleType: 'disc', marginLeft: '20px' }}>
                         <ListSubheader
                             sx={{
@@ -57,29 +83,42 @@ export default function About() {
                             }}
                         ></ListSubheader>
                         <ListItem sx={{ display: 'list-item' }}>
-                            The overview page of the PetriNet models that are saved in the backend,
+                            The overview page of the PetriNet models that you have saved:
+                            <Button
+                                style={{ marginLeft: '20px' }}
+                                variant="contained"
+                                component={NavLink}
+                                to={'/Overview'}
+                            >
+                                Overview of Saved Models
+                            </Button>
                         </ListItem>
-                        <Button variant="contained" component={NavLink} to={'/Overview'}>
-                            Overview of Saved Models
-                        </Button>
+
                         <ListItem sx={{ display: 'list-item' }}>
                             The modelling tool used to edit and simulate existing PetriNets, as well
-                            as create new ones,
+                            as create new ones:
+                            <Button
+                                style={{ marginLeft: '20px' }}
+                                variant="contained"
+                                component={NavLink}
+                                to={'/PetriNetModelling'}
+                            >
+                                Modelling Tool
+                            </Button>
                         </ListItem>
-                        <Button variant="contained" component={NavLink} to={'/PetriNetModelling'}>
-                            Modelling Tool
-                        </Button>
                         <ListItem sx={{ display: 'list-item' }}>
-                            The transformation tool for converting PertriNets to other formats.
+                            The transformation tool for converting between different types of
+                            process modelling notations:
+                            <Button
+                                style={{ marginLeft: '20px' }}
+                                variant="contained"
+                                component={NavLink}
+                                to={'/transformer'}
+                            >
+                                Transformation Tool
+                            </Button>
                         </ListItem>
-                        <Button variant="contained" component={NavLink} to={'/transformer'}>
-                            Transformation Tool
-                        </Button>
                     </List>
-                </Grid>
-                <Grid item xs={12}>
-                    This tool was created as part of the Software Engineering and Architecture
-                    course at the University of Copenhagen in spring 2022.
                 </Grid>
             </Grid>
         </div>
