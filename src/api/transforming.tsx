@@ -10,8 +10,9 @@ const backendConnection = withResponseFormatterInterceptor(
     })
 )
 
-export const getPetriNetById = (id: number): Promise<Response<PetriNet>> =>
+export const transformBpmnToPetriNet = (bpmn: unknown): Promise<Response<PetriNet>> =>
     backendConnection.request({
-        url: `/${id}`,
-        method: 'GET',
+        url: `/bpmn-to-petri-net`,
+        method: 'POST',
+        data: bpmn,
     })

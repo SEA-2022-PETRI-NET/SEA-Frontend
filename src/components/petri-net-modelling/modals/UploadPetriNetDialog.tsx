@@ -63,8 +63,7 @@ export default function UploadPetriNetDialog({ open, onClose, loadPetriNet }: Up
                                 message.error(`${info.file.name} file upload failed.`)
                             }
                         }}
-                        action={(file) => {
-                            console.log(file)
+                        action={() => {
                             return 'done'
                         }}
                         onRemove={() => {
@@ -75,10 +74,7 @@ export default function UploadPetriNetDialog({ open, onClose, loadPetriNet }: Up
                             <InboxOutlined />
                         </p>
                         <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                        <p className="ant-upload-hint">
-                            Support for a single or bulk upload. Strictly prohibit from uploading
-                            company data or other band files
-                        </p>
+                        <p className="ant-upload-hint">The file should be a JSON file</p>
                     </Dragger>
                 </div>
             </DialogContent>
