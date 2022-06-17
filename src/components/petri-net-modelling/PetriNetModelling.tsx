@@ -45,7 +45,7 @@ export interface NodeDataProps {
     //For Transitions
     isEnabled?: boolean
     petriNetId: string
-    fireTransition?: () => void
+    fireTransition?: () => Promise<void>
 }
 
 export interface EdgeDataProps {
@@ -111,10 +111,10 @@ export default function PetriNetModelling() {
     }
     // USED FOR SIMULATION
 
-    function attemptToFireTransition(nodeId: number) {
-        fireTransitionRequest(Number(petriNetId), nodeId)
-        fetchPetriNet()
-        fetchEnabledTransitions()
+    async function attemptToFireTransition(nodeId: number) {
+        await fireTransitionRequest(Number(petriNetId), nodeId)
+        await fetchPetriNet()
+        await fetchEnabledTransitions()
     }
 
     useEffect(() => {
@@ -155,7 +155,6 @@ export default function PetriNetModelling() {
                         data: {
                             name: t.name,
                             setSelectedNode: setSelectedNode,
-                            isEnabled: false,
                             fireTransition: () => attemptToFireTransition(t.transitionId),
                         },
                     } as Node<NodeDataProps>
