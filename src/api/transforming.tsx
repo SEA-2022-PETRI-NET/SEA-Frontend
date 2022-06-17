@@ -5,7 +5,7 @@ import withResponseFormatterInterceptor from './util/with-response-formatter-int
 
 const backendConnection = withResponseFormatterInterceptor(
     axios.create({
-        baseURL: process.env.REACT_APP_BACKEND_URL_TRANSFORMER_ENGINE,
+        baseURL: process.env.REACT_APP_BACKEND_URL_TRANSFORM_ENGINE,
         headers: { 'Access-Control-Allow-Origin': '*' },
     })
 )
