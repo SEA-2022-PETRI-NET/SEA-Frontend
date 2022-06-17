@@ -98,7 +98,13 @@ export default function ActionButtons({
                 id: place.placeId.toString(),
                 type: PlaceNode.displayName,
                 position: position,
-                data: { name: place.name, petriNetId: 'new', setSelectedNode: setSelectedNode },
+                data: {
+                    name: place.name,
+                    petriNetId: 'new',
+                    numberOfTokens: place.numberOfTokens,
+                    tokens: place.tokens,
+                    setSelectedNode: setSelectedNode,
+                },
             })
         })
 
