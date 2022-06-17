@@ -35,8 +35,8 @@ export default function Overview() {
     }, [])
 
     return (
-        <div>
-            <h1 style={{ marginTop: '100px' }}>Overview</h1>
+        <div style={{ width: '700px', margin: '100px auto' }}>
+            <h1>Overview of stored petri nets</h1>
             <Button variant="contained" onClick={() => navigate('/modelling/new')}>
                 Create new petri net
             </Button>

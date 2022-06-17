@@ -1,4 +1,4 @@
-import { Button } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 import { memo } from 'react'
 import { Node, Handle, Position, NodeProps, XYPosition } from 'react-flow-renderer'
 import { useAppSelector } from '../../store/hooks'
@@ -41,7 +41,9 @@ const TransitionNode = memo((node: NodeProps<NodeDataProps>) => {
                     }
                 }}
             >
-                {node.data.name}
+                <Typography style={{ textTransform: 'none', fontSize: '12px' }}>
+                    {node.data.name}
+                </Typography>
             </Button>
             <Handle
                 type="source"

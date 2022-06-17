@@ -88,29 +88,39 @@ export default function ActionButtons({
     }
 
     const loadPetriNet = (petriNet: PetriNet) => {
-        const nodes: any = []
-        const edges: any = []
+        const nodes: Node<NodeDataProps>[] = []
+        const edges: Edge<EdgeDataProps>[] = []
         petriNet.places.forEach(function (place) {
+            const position = place.position
+                ? place.position
+                : { x: Math.random() * 300, y: Math.random() * 300 }
             nodes.push({
                 id: place.placeId.toString(),
-                type: 'place',
-                position: { x: 0, y: 0 },
-                data: { label: place.name, setSelectedNode: setSelectedNode },
+                type: PlaceNode.displayName,
+                position: position,
+                data: { name: place.name, petriNetId: 'new', setSelectedNode: setSelectedNode },
             })
         })
 
         petriNet.transitions.forEach(function (transition) {
+            const position = transition.position
+                ? transition.position
+                : { x: Math.random() * 300, y: Math.random() * 300 }
             nodes.push({
                 id: transition.transitionId.toString(),
-                type: 'transition',
-                position: { x: 0, y: 0 },
-                data: { label: transition.name, setSelectedNode: setSelectedNode },
+                type: TransitionNode.displayName,
+                position: position,
+                data: {
+                    name: transition.name,
+                    petriNetId: 'new',
+                    setSelectedNode: setSelectedNode,
+                },
             })
         })
 
         petriNet.arcs.forEach(function (arc) {
             edges.push({
-                id: arc.id.toString(),
+                id: `e${arc.sourceNode}-${arc.targetNode}`,
                 source: arc.sourceNode.toString(),
                 target: arc.targetNode.toString(),
             })
@@ -240,6 +250,7 @@ export default function ActionButtons({
             <UploadPetriNetDialog
                 open={uploadModalOpen}
                 onClose={() => setUploadModalOpen(false)}
+                loadPetriNet={loadPetriNet}
             />
         </>
     )

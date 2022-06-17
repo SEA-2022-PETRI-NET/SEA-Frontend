@@ -55,12 +55,14 @@ interface SidebarProps {
     openDrawer: boolean
     setOpenDrawer: (value: boolean) => void
     enabledTransitions: Transition[]
+    fireTransition: (transitionId: number) => Promise<void>
 }
 
 export default function SidebarEnabledTransitions({
     openDrawer,
     setOpenDrawer,
     enabledTransitions,
+    fireTransition,
 }: SidebarProps) {
     return (
         <>
@@ -91,7 +93,13 @@ export default function SidebarEnabledTransitions({
                             disablePadding
                             sx={{ display: 'block', marginTop: '10px' }}
                         >
-                            <Button style={{ textTransform: 'none' }}>
+                            <Button
+                                style={{ textTransform: 'none' }}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    fireTransition(transition.transitionId)
+                                }}
+                            >
                                 Id: {transition.transitionId}{' '}
                                 {openDrawer && 'name: ' + transition.name}{' '}
                             </Button>
