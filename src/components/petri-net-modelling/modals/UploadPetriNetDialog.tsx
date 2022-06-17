@@ -25,6 +25,7 @@ export default function UploadPetriNetDialog({ open, onClose, loadPetriNet }: Up
                 loadPetriNet(petriNet)
             }
             reader.readAsText(file)
+            onClose()
         }
     }
 

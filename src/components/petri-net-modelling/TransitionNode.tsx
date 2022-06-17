@@ -19,7 +19,7 @@ const TransitionNode = memo((node: NodeProps<NodeDataProps>) => {
             <Button
                 sx={{
                     bgcolor: isSimRunning && node.data.isEnabled ? 'green' : 'background.paper',
-                    borderColor: 'text.primary',
+                    borderColor: isSimRunning && node.data.isEnabled ? 'green' : 'text.primary',
                     m: 1,
                     border: 1,
                     width: '5rem',
@@ -41,7 +41,13 @@ const TransitionNode = memo((node: NodeProps<NodeDataProps>) => {
                     }
                 }}
             >
-                <Typography style={{ textTransform: 'none', fontSize: '12px' }}>
+                <Typography
+                    style={{
+                        textTransform: 'none',
+                        fontSize: '12px',
+                        color: isSimRunning && node.data.isEnabled ? 'black' : '#1976d2',
+                    }}
+                >
                     {node.data.name}
                 </Typography>
             </Button>
