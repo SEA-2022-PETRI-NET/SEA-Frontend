@@ -18,18 +18,21 @@ import { PetriNet, Place, Transition, Arc } from '../../models/PetrinetModels'
 import { Node, Edge } from 'react-flow-renderer'
 import UploadPetriNetDialog from './modals/UploadPetriNetDialog'
 import { useNavigate } from 'react-router-dom'
-import { EdgeDataProbs, NodeDataProbs } from './PetriNetModelling'
+import { EdgeDataProps, NodeDataProps } from './PetriNetModelling'
 import PlaceNode from './PlaceNode'
 import TransitionNode from './TransitionNode'
+import StopIcon from '@mui/icons-material/Stop'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { isSimulationRunning, setIsSimulationRunning } from '../../store/petriNetSlice'
 
 interface ActionButtons {
     style?: React.CSSProperties | undefined
-    nodes: Node<NodeDataProbs>[]
-    edges: Edge<EdgeDataProbs>[]
+    nodes: Node<NodeDataProps>[]
+    edges: Edge<EdgeDataProps>[]
     petriNetId: string
     petriNetName: string
-    setNodes: (nodes: Node<NodeDataProbs>[]) => void
-    setEdges: (edges: Edge<EdgeDataProbs>[]) => void
+    setNodes: (nodes: Node<NodeDataProps>[]) => void
+    setEdges: (edges: Edge<EdgeDataProps>[]) => void
     setSelectedNode: (value: Node) => void
 }
 
@@ -45,12 +48,14 @@ export default function ActionButtons({
 }: ActionButtons) {
     const [uploadModalOpen, setUploadModalOpen] = useState(false)
     const navigate = useNavigate()
+    const isSimRunning = useAppSelector(isSimulationRunning)
+    const dispatch = useAppDispatch()
 
     const getCurrentPetriNet = () => {
         const arcs: Arc[] = []
         const places: Place[] = []
         const transitions: Transition[] = []
-        nodes.forEach(function (node: Node<NodeDataProbs>) {
+        nodes.forEach(function (node: Node<NodeDataProps>) {
             if (node.type === PlaceNode.displayName) {
                 places.push({
                     placeId: Number(node.id),
@@ -68,7 +73,7 @@ export default function ActionButtons({
                 } as Transition)
             }
         })
-        edges.forEach((edge: Edge<EdgeDataProbs>) => {
+        edges.forEach((edge: Edge<EdgeDataProps>) => {
             arcs.push({
                 sourceNode: Number(edge.source),
                 targetNode: Number(edge.target),
@@ -174,44 +179,62 @@ export default function ActionButtons({
 
     return (
         <>
-            <div style={style}>
-                <Tooltip title="Delete">
-                    <IconButton onClick={onDeletePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Save">
-                    <IconButton onClick={onSavePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
-                        <SaveIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Upload">
-                    <IconButton
-                        sx={{ margin: '0px 5px 0px 5px' }}
-                        onClick={() => setUploadModalOpen(true)}
-                    >
-                        <UploadTwoToneIcon sx={{ color: 'blue' }} />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Download">
-                    <IconButton onClick={onDownloadPetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
-                        <FileDownloadTwoToneIcon sx={{ color: 'blue' }} />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Validate">
-                    <IconButton onClick={onValidatePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
-                        <CheckCircleTwoToneIcon sx={{ color: 'blue' }} />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Simulate">
-                    <IconButton
-                        onClick={() => navigate(`/modelling/${petriNetId}/simulate`)}
-                        sx={{ margin: '0px 5px 0px 0px' }}
-                    >
-                        <PlayArrowTwoToneIcon sx={{ color: 'green' }} />
-                    </IconButton>
-                </Tooltip>
-            </div>
+            {isSimRunning ? (
+                <div style={style}>
+                    <Tooltip title="Stop simulation">
+                        <IconButton
+                            onClick={() => {
+                                dispatch(setIsSimulationRunning(false))
+                            }}
+                            sx={{ margin: '0px 5px 0px 0px' }}
+                        >
+                            <StopIcon sx={{ color: 'red' }} />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+            ) : (
+                <div style={style}>
+                    <Tooltip title="Delete">
+                        <IconButton onClick={onDeletePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Save">
+                        <IconButton onClick={onSavePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                            <SaveIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Upload">
+                        <IconButton
+                            sx={{ margin: '0px 5px 0px 5px' }}
+                            onClick={() => setUploadModalOpen(true)}
+                        >
+                            <UploadTwoToneIcon sx={{ color: 'blue' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Download">
+                        <IconButton onClick={onDownloadPetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                            <FileDownloadTwoToneIcon sx={{ color: 'blue' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Validate">
+                        <IconButton onClick={onValidatePetriNet} sx={{ margin: '0px 5px 0px 5px' }}>
+                            <CheckCircleTwoToneIcon sx={{ color: 'blue' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Simulate">
+                        <IconButton
+                            onClick={() => {
+                                onSavePetriNet()
+                                dispatch(setIsSimulationRunning(true))
+                            }}
+                            sx={{ margin: '0px 5px 0px 0px' }}
+                        >
+                            <PlayArrowTwoToneIcon sx={{ color: 'green' }} />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+            )}
 
             {/* MODALS */}
             <UploadPetriNetDialog

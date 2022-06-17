@@ -26,7 +26,7 @@ export default function Overview() {
             const response = await getPetriNets()
             if (response.successful) {
                 setPetriNets(response.data)
-                toast.success('Retrieved petri nets')
+                //toast.success('Retrieved petri nets')
             } else {
                 toast.error('Could not retrieve petri nets')
             }
