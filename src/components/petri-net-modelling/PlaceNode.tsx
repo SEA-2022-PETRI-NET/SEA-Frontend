@@ -1,4 +1,4 @@
-import { Button } from '@mui/material'
+import { Button, Typography } from '@mui/material'
 import { memo } from 'react'
 import { Node, Handle, Position, NodeProps, XYPosition } from 'react-flow-renderer'
 import { useAppSelector } from '../../store/hooks'
@@ -28,6 +28,7 @@ const PlaceNode = memo((node: NodeProps<NodeDataProps>) => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
+                    flexDirection: 'column',
                 }}
                 onClick={(e) => {
                     e.preventDefault()
@@ -39,8 +40,12 @@ const PlaceNode = memo((node: NodeProps<NodeDataProps>) => {
                     }
                 }}
             >
-                {node.data.name}
-                {node.data.numberOfTokens}
+                <Typography style={{ textTransform: 'none', fontSize: '12px' }}>
+                    {node.data.name}
+                </Typography>
+                <Typography style={{ textTransform: 'none', fontSize: '12px', marginTop: '10px' }}>
+                    Tokens: {node.data.numberOfTokens}
+                </Typography>
             </Button>
             <Handle
                 type="source"
