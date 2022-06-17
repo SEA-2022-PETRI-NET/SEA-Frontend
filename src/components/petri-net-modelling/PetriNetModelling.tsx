@@ -375,6 +375,7 @@ export default function PetriNetModelling() {
                     openDrawer={openDrawer}
                     setOpenDrawer={setOpenDrawer}
                     enabledTransitions={enabledTransitions}
+                    fireTransition={attemptToFireTransition}
                 />
             ) : (
                 <Sidebar openDrawer={openDrawer} setOpenDrawer={setOpenDrawer} />
