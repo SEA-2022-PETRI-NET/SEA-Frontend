@@ -265,7 +265,10 @@ export default function PetriNetModelling() {
                     type: newNodeType,
                     position: newNodePosition,
                     data: {
-                        label: `${newNodeType} node`,
+                        name:
+                            newNodeType === PlaceNode.displayName
+                                ? `P${newNodeId}`
+                                : `T${newNodeId}`,
                         setSelectedNode: setSelectedNode,
                     },
                 }
@@ -353,7 +356,7 @@ export default function PetriNetModelling() {
                     type,
                     position,
                     data: {
-                        name: `${type} node ${nodeId}`,
+                        name: type === PlaceNode.displayName ? `P${nodeId}` : `T${nodeId}`,
                         setSelectedNode: setSelectedNode,
                         petriNetId: petriNetId ?? '',
                     },
