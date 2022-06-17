@@ -8,31 +8,54 @@ import { Upload, message } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import 'antd/dist/antd.css'
 import Button from '@mui/material/Button'
+import { PetriNet } from '../models/PetrinetModels'
+import { transformBpmnToPetriNet } from '../api/transforming'
+import { toast } from 'react-toastify'
 
 const { Dragger } = Upload
+
+enum ProcessModellingNotations {
+    PetriNet = 'PETRI_NET',
+    BPMN = 'BPMN',
+    DCR = 'DCR',
+}
 
 export default function Transforming() {
     const [fromType, setFromType] = useState('')
     const [toType, setToType] = useState('')
+    const [file, setFile] = useState<Blob | null>(null)
 
-    const props = {
-        name: 'file',
-        multiple: true,
-        action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-        onChange(info: any) {
-            const { status } = info.file
-            if (status !== 'uploading') {
-                console.log(info.file, info.fileList)
+    const onDownloadPetriNet = async (petriNet: PetriNet) => {
+        const blob = new Blob([JSON.stringify(petriNet)], {
+            type: 'application/json',
+        })
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = petriNet.name + '.json'
+        document.body.appendChild(link)
+        link.click()
+        link.parentNode?.removeChild(link)
+    }
+
+    const uploadJson = () => {
+        if (
+            file &&
+            fromType === ProcessModellingNotations.BPMN.toString() &&
+            toType === ProcessModellingNotations.PetriNet.toString()
+        ) {
+            const reader = new FileReader()
+            reader.onload = async (e) => {
+                const bpmn = JSON.parse(e.target?.result?.toString() ?? '')
+                const response = await transformBpmnToPetriNet(bpmn)
+                if (response.successful) {
+                    onDownloadPetriNet(response.data)
+                } else {
+                    toast.error(response.message)
+                }
             }
-            if (status === 'done') {
-                message.success(`${info.file.name} file uploaded successfully.`)
-            } else if (status === 'error') {
-                message.error(`${info.file.name} file upload failed.`)
-            }
-        },
-        onDrop(e: React.DragEvent) {
-            console.log('Dropped files', e.dataTransfer.files)
-        },
+            reader.readAsText(file)
+        }
     }
 
     return (
@@ -47,10 +70,15 @@ export default function Transforming() {
                             value={fromType}
                             label="type"
                             onChange={(e) => setFromType(e.target.value as string)}
+                            style={{ backgroundColor: 'white' }}
                         >
-                            <MenuItem value={10}>Perti Net</MenuItem>
-                            <MenuItem value={20}>DCR</MenuItem>
-                            <MenuItem value={30}>BPMN</MenuItem>
+                            <MenuItem value={ProcessModellingNotations.PetriNet} disabled={true}>
+                                Perti Net
+                            </MenuItem>
+                            <MenuItem value={ProcessModellingNotations.DCR} disabled={true}>
+                                DCR
+                            </MenuItem>
+                            <MenuItem value={ProcessModellingNotations.BPMN}>BPMN</MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
@@ -64,27 +92,54 @@ export default function Transforming() {
                             value={toType}
                             label="type"
                             onChange={(e) => setToType(e.target.value as string)}
+                            style={{ backgroundColor: 'white' }}
                         >
-                            <MenuItem value={10}>Perti Net</MenuItem>
-                            <MenuItem value={20}>DCR</MenuItem>
-                            <MenuItem value={30}>BPMN</MenuItem>
+                            <MenuItem value={ProcessModellingNotations.PetriNet}>
+                                Perti Net
+                            </MenuItem>
+                            <MenuItem value={ProcessModellingNotations.DCR} disabled={true}>
+                                DCR
+                            </MenuItem>
+                            <MenuItem value={ProcessModellingNotations.BPMN} disabled={true}>
+                                BPMN
+                            </MenuItem>
                         </Select>
                     </FormControl>
                 </Grid>
                 <Grid item xs={12}>
-                    <Dragger {...props}>
+                    <Dragger
+                        name={'file'}
+                        accept={'application/json'}
+                        beforeUpload={(file) => {
+                            setFile(file)
+                            return false
+                        }}
+                        onChange={(info) => {
+                            const { status } = info.file
+                            if (status === 'done') {
+                                message.success(`${info.file.name} file uploaded successfully.`)
+                            } else if (status === 'error') {
+                                message.error(`${info.file.name} file upload failed.`)
+                            }
+                        }}
+                        action={() => {
+                            return 'done'
+                        }}
+                        onRemove={() => {
+                            setFile(null)
+                        }}
+                    >
                         <p className="ant-upload-drag-icon">
                             <InboxOutlined />
                         </p>
                         <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                        <p className="ant-upload-hint">
-                            Support for a single or bulk upload. Strictly prohibit from uploading
-                            company data or other band files
-                        </p>
+                        <p className="ant-upload-hint">The file should be a JSON file</p>
                     </Dragger>
                 </Grid>
                 <Grid item xs={12} sx={{ marginTop: 5 }}>
-                    <Button variant="outlined">Convert</Button>
+                    <Button variant="outlined" onClick={uploadJson}>
+                        Convert
+                    </Button>
                 </Grid>
             </Grid>
         </div>
