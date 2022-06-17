@@ -88,8 +88,8 @@ export default function ActionButtons({
     }
 
     const loadPetriNet = (petriNet: PetriNet) => {
-        const nodes: Node<NodeDataProps>[] = []
-        const edges: Edge<EdgeDataProps>[] = []
+        const nodes: Node[] = []
+        const edges: Edge[] = []
         petriNet.places.forEach(function (place) {
             const position = place.position
                 ? place.position
@@ -98,7 +98,12 @@ export default function ActionButtons({
                 id: place.placeId.toString(),
                 type: PlaceNode.displayName,
                 position: position,
-                data: { name: place.name, petriNetId: 'new', setSelectedNode: setSelectedNode },
+                data: {
+                    name: place.name,
+                    numberOfTokens: place.numberOfTokens,
+                    tokens: place.tokens,
+                    setSelectedNode: setSelectedNode,
+                },
             })
         })
 
@@ -112,7 +117,6 @@ export default function ActionButtons({
                 position: position,
                 data: {
                     name: transition.name,
-                    petriNetId: 'new',
                     setSelectedNode: setSelectedNode,
                 },
             })
@@ -234,9 +238,11 @@ export default function ActionButtons({
                     </Tooltip>
                     <Tooltip title="Simulate">
                         <IconButton
-                            onClick={() => {
-                                onSavePetriNet()
-                                dispatch(setIsSimulationRunning(true))
+                            onClick={async () => {
+                                await onSavePetriNet()
+                                if (petriNetId !== 'new' && petriNetId) {
+                                    dispatch(setIsSimulationRunning(true))
+                                }
                             }}
                             sx={{ margin: '0px 5px 0px 0px' }}
                         >
